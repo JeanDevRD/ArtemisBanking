@@ -2,6 +2,8 @@
 
 namespace ArtemisBanking.Core.Domain.Entities
 {
+    //Registra cada consumo o intento de consumo realizado con una tarjeta de crédito,
+    //incluyendo su estado de aprobación o rechazo.
     public class CardTransaction : CommonEntity<int>
     {
         public DateTime Date { get; set; }

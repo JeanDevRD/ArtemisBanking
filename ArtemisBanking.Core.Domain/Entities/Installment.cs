@@ -2,6 +2,8 @@
 
 namespace ArtemisBanking.Core.Domain.Entities
 {
+ //Cuota individual dentro de la tabla de amortización de un préstamo,
+ // con su fecha de vencimiento, monto a pagar, y control de si fue pagada o está atrasada.
     public class Installment : CommonEntity<int>
     {
         public DateTime PaymentDate { get; set; }
