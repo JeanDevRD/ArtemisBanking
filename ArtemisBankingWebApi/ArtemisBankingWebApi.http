@@ -1,0 +1,6 @@
+@ArtemisBankingWebApi_HostAddress = http://localhost:5150
+
+GET {{ArtemisBankingWebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
