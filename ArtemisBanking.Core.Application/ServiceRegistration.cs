@@ -1,6 +1,6 @@
 ﻿namespace ArtemisBanking.Core.Application
 {
-    public class Class1
+    public class ServiceRegistration
     {
 
     }
