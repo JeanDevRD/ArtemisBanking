@@ -14,7 +14,7 @@ namespace ArtemisBanking.Infraestructure.Persistence.Contexts
         public DbSet<CreditCard> CreditCards { get; set; }
         public DbSet<Installment> Installments { get; set; }
         public DbSet<Loan> Loans { get; set; }  
-        public DbSet<Marchant> Marchants { get; set; }
+        public DbSet<Merchant> Marchants { get; set; }
         public DbSet<SavingsAccount> SavingsAccounts { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
 
