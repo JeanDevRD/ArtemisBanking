@@ -1,5 +1,4 @@
 ﻿using ArtemisBanking.Core.Domain.Common;
-using System.Transactions;
 
 namespace ArtemisBanking.Core.Domain.Entities
 {

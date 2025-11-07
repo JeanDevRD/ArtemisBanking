@@ -16,5 +16,21 @@ namespace ArtemisBanking.Core.Application.Services
             _transactionRepository = transactionRepository;
             _mapper = mapper;
         }
+        public async Task<List<TransactionDto>> GetAllWithInclude()
+        {
+            try
+            {
+                var creditCards = await _transactionRepository.GetAllListIncluideAsync(["Transactions"]);
+                if (creditCards == null)
+                {
+                    return new List<TransactionDto>();
+                }
+                return _mapper.Map<List<TransactionDto>>(creditCards);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving credit cards with included data: " + ex.Message);
+            }
+        }
     }
 }

@@ -67,7 +67,7 @@ namespace ArtemisBanking.Core.Application.Services
             }
         }
 
-        public async Task<EntityDto> GetByIdAsync(int id)
+        public virtual async Task<EntityDto> GetByIdAsync(int id)
         {
             try
             {

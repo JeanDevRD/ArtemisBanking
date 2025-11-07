@@ -1,4 +1,5 @@
 ﻿using ArtemisBanking.Core.Application.Dtos.Installment;
+using ArtemisBanking.Core.Application.Dtos.SavingsAccount;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,6 @@ namespace ArtemisBanking.Core.Application.Interfaces
 {
     public interface IInstallmentService : IGenericService<InstallmentDto>
     {
+        Task<List<InstallmentDto>> GetAllWithInclude();
     }
 }

@@ -9,5 +9,6 @@ namespace ArtemisBanking.Core.Application.Interfaces
 {
     public interface ITransactionService : IGenericService<TransactionDto>
     {
+        Task<List<TransactionDto>> GetAllWithInclude();
     }
 }

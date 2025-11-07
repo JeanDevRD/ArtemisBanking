@@ -3,11 +3,7 @@ using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Domain.Entities;
 using ArtemisBanking.Infraestructure.Persistence.Repositories;
 using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ArtemisBanking.Core.Application.Services
 {
@@ -20,6 +16,26 @@ namespace ArtemisBanking.Core.Application.Services
             _creditCardRepository = genericRepository;
             _mapper = mapper;
         }
+        public override async Task<CreditCardDto> GetByIdAsync(int id)
+        {
+            try
+            {
+                var entities = await _creditCardRepository.GetAllListIncluideAsync(["CardTransactions"]);
+               
+                var entity = entities.FirstOrDefault(e => e.Id == id);
+                if (entity == null)
+                {
+                    return null!;
+                }
+                return _mapper.Map<CreditCardDto>(entity);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null!;
+            }
+        }
+
         public async Task<List<CreditCardDto>> GetAllWithInclude()
         {
             try

@@ -1,4 +1,5 @@
-﻿using ArtemisBanking.Core.Application.Dtos.Installment;
+﻿using ArtemisBanking.Core.Application.Dtos.CreditCard;
+using ArtemisBanking.Core.Application.Dtos.Installment;
 using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Domain.Entities;
 using ArtemisBanking.Infraestructure.Persistence.Repositories;
@@ -16,5 +17,22 @@ namespace ArtemisBanking.Core.Application.Services
           _InstallmentRepository = installmentRepository;
           _mapper = mapper;
         }
+        public async Task<List<InstallmentDto>> GetAllWithInclude()
+        {
+            try
+            {
+                var creditCards = await _InstallmentRepository.GetAllListIncluideAsync(["Loan"]);
+                if (creditCards == null)
+                {
+                    return new List<InstallmentDto>();
+                }
+                return _mapper.Map<List<InstallmentDto>>(creditCards);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error retrieving credit cards with included data: " + ex.Message);
+            }
+        }
+
     }
 }
