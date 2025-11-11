@@ -1,4 +1,5 @@
 ﻿using ArtemisBanking.Core.Application.Dtos.CardTransaction;
+using ArtemisBanking.Core.Application.Dtos.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;

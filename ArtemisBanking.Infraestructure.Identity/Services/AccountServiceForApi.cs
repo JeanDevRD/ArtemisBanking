@@ -5,13 +5,9 @@ using ArtemisBanking.Infraestructure.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ArtemisBanking.Infraestructure.Identity.Services
 {
@@ -108,7 +104,7 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
             return await base.ForgotPasswordAsync(request, true);
         }
 
-        #region "Private methods"
+        #region Private methods
         private async Task<JwtSecurityToken> GenerateJwtToken(User user)
         {
             var userClaims = await _userManager.GetClaimsAsync(user);

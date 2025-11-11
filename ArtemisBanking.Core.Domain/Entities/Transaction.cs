@@ -9,6 +9,7 @@ namespace ArtemisBanking.Core.Domain.Entities
         public DateTime Date { get; set; }
         public decimal Amount { get; set; }
         public required int Type { get; set; } // Si es una cuenta de DÉBITO o CRÉDITO
+        public required int TypeTransaction { get; set; } // Si es depósito, retiro, transferencia, pago, etc.
         public required string Source { get; set; }
         public required string Beneficiary { get; set; }
         public required int Status { get; set; } // Si esta aprovada o rechazada 

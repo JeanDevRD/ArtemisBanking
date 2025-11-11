@@ -75,7 +75,7 @@ namespace ArtemisBanking.Infraestructure.Identity.Seeds
         {
             if (await userManager.Users.AllAsync(u => u.Id != user.Id))
             {
-                var existingUser = await userManager.FindByEmailAsync(user.Email);
+                var existingUser = await userManager.FindByEmailAsync(user.Email!);
                 if (existingUser == null)
                 {
                     var result = await userManager.CreateAsync(user, password);

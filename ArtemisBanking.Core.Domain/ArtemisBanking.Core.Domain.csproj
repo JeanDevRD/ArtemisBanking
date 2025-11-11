@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="Common\Enum\TypeTransaction.cs" />
+  </ItemGroup>
+
 </Project>

@@ -1,9 +1,5 @@
-﻿using ArtemisBanking.Core.Application.Dtos.SavingsAccount;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ArtemisBanking.Core.Application.Dtos.Common;
+using ArtemisBanking.Core.Application.Dtos.SavingsAccount;
 
 namespace ArtemisBanking.Core.Application.Dtos.Transaction
 {

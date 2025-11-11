@@ -8,5 +8,21 @@ namespace ArtemisBanking.Infraestructure.Persistence.Repositories
         public CardTransactionRepository(ArtemisBankingContextSqlServer context) : base(context)
         {
         }
+
+        public async Task<bool> PaymentCard(int creditCardId, decimal amount)
+        {
+            var creditCard = await _context.CreditCards.FindAsync(creditCardId);
+            
+            if (creditCard == null || creditCard.CurrentDebt < amount)
+            {
+                return false; 
+            }
+
+            creditCard.CurrentDebt -= amount;
+            _context.CreditCards.Update(creditCard);
+
+            await _context.SaveChangesAsync();
+            return true; 
+        }
     }
 }

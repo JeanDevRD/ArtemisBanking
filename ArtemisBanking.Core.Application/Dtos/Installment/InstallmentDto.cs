@@ -1,5 +1,6 @@
 ﻿
 
+using ArtemisBanking.Core.Application.Dtos.Common;
 using ArtemisBanking.Core.Application.Dtos.Loan;
 
 namespace ArtemisBanking.Core.Application.Dtos.Installment

@@ -1,4 +1,5 @@
-﻿using ArtemisBanking.Core.Application.Dtos.CreditCard;
+﻿using ArtemisBanking.Core.Application.Dtos.Common;
+using ArtemisBanking.Core.Application.Dtos.CreditCard;
 using ArtemisBanking.Core.Domain.Entities;
 using System;
 using System.Collections.Generic;
