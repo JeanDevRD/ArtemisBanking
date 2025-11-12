@@ -8,5 +8,7 @@ namespace ArtemisBanking.Infraestructure.Persistence.Repositories
         public SavingsAccountRepository(ArtemisBankingContextSqlServer context) : base(context)
         {
         }
+
+
     }
 }

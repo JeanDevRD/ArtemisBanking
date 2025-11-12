@@ -1,8 +1,10 @@
 ﻿using ArtemisBanking.Core.Application.Dtos.SavingsAccount;
 using ArtemisBanking.Core.Application.Interfaces;
+using ArtemisBanking.Core.Domain.Common.Enum;
 using ArtemisBanking.Core.Domain.Entities;
 using ArtemisBanking.Infraestructure.Persistence.Repositories;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 
 namespace ArtemisBanking.Core.Application.Services
 {
@@ -51,5 +53,18 @@ namespace ArtemisBanking.Core.Application.Services
                 throw new Exception("Error retrieving credit cards with included data: " + ex.Message);
             }
         }
+
+        public async Task AddBalance(string userId, decimal amount)
+        {
+            var account = await _savingsAccountRepository.GetAllQueryAsync().FirstOrDefaultAsync(a => a.UserId == userId && a.Type == (int)TypeSavingAccount.Main);
+
+            if (account == null)
+                throw new Exception("Cuenta principal no encontrada");
+
+            account.Balance += amount;
+
+            await _savingsAccountRepository.UpdateAsync(account.Id, account);
+        }
+
     }
 }
