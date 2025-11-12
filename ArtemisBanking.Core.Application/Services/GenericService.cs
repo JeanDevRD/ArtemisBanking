@@ -19,7 +19,7 @@ namespace ArtemisBanking.Core.Application.Services
             _mapper = mapper;
         }
 
-        public async Task<EntityDto> AddAsync(EntityDto entityDto)
+        public virtual async Task<EntityDto> AddAsync(EntityDto entityDto)
         {
             try
             {
@@ -38,7 +38,7 @@ namespace ArtemisBanking.Core.Application.Services
             }
         }
 
-        public async Task DeleteAsync(int id)
+        public virtual async Task DeleteAsync(int id)
         {
             try
             {
@@ -53,7 +53,7 @@ namespace ArtemisBanking.Core.Application.Services
 
         }
 
-        public async Task<List<EntityDto>> GetAllAsync()
+        public virtual async Task<List<EntityDto>> GetAllAsync()
         {
             try
             {
@@ -85,7 +85,7 @@ namespace ArtemisBanking.Core.Application.Services
             }
         }
 
-        public async Task<EntityDto> UpdateAsync(int id, EntityDto entityDto)
+        public virtual async Task<EntityDto> UpdateAsync(int id, EntityDto entityDto)
         {
             try
             {

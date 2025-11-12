@@ -379,6 +379,29 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
             };
         }
 
+
+        public virtual async Task<UserDto?> GetUserByIdentificationNumber(string IdentificationNumber)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.IdentificationNumber == IdentificationNumber);
+            if (user == null) return null;
+
+            var rolesList = await _userManager.GetRolesAsync(user);
+
+            return new UserDto()
+            {
+                Id = user.Id,
+                Email = user.Email ?? "",
+                LastName = user.LastName,
+                FirstName = user.FirstName,
+                UserName = user.UserName ?? "",
+                IdentificationNumber = user.IdentificationNumber,
+                Phone = user.PhoneNumber,
+                IsVerified = user.EmailConfirmed,
+                IsActive = user.IsActive,
+                Role = rolesList.FirstOrDefault() ?? ""
+            };
+        }
+
         public virtual async Task<UserDto?> GetUserByUserName(string userName)
         {
             var user = await _userManager.FindByNameAsync(userName);
