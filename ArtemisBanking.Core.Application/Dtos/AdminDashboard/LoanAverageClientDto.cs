@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ArtemisBanking.Core.Application.Dtos.AdminDashboard
 {
-    public class PaymentHistoryDto
+    public class LoanAverageClientDto
     {
-        public required int TotalPaymentHistory { get; set; } 
-        public required int PaymentHistoryForDay { get; set; }
+        public double AverageLoanAmount { get; set; }
+        public int TotalClients { get; set; }
     }
 }

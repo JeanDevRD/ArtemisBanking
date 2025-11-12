@@ -16,7 +16,6 @@ var app = builder.Build();
 
 builder.Services.AddIdentityLayerForWebApi(builder.Configuration);
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

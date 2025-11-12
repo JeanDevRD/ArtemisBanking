@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace ArtemisBanking.Core.Application.Dtos.AdminDashboard
 {
-    public class PaymentHistoryDto
+    public class TotalFinancialProductDto
     {
-        public required int TotalPaymentHistory { get; set; } 
-        public required int PaymentHistoryForDay { get; set; }
+        public required int TotalFinancialProductsCount { get; set; }
     }
 }

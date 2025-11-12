@@ -1,6 +1,7 @@
 ﻿using ArtemisBanking.Core.Application.Dtos.AdminDashboard;
 using ArtemisBanking.Core.Application.Dtos.Common;
 using ArtemisBanking.Core.Application.Interfaces;
+using ArtemisBanking.Core.Domain.Common.Enum;
 using ArtemisBanking.Infraestructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -244,6 +245,121 @@ namespace ArtemisBanking.Core.Application.Services
             return result;
         }
 
+        public async Task<ResultDto<PaymentHistoryDto>> TotalPaymentHistory()
+        {
+            var result = new ResultDto<PaymentHistoryDto>();
+            try
+            {
+                var totalPaymentHistory = await _transactionRepo.GetAllQueryAsync()
+                    .Where(x => x.TypeTransaction == (int)TypeTransaction.Paid).CountAsync();
 
+                if (totalPaymentHistory == 0)
+                {
+                    result.IsError = true;
+                    result.Message = "Aun no hya historial de pagos.";
+                    return result;
+                }
+                var paymentHistoryForDay = await _transactionRepo.GetAllQueryAsync()
+                .Where(x => x.Date.Date == DateTime.UtcNow.Date &&  x.TypeTransaction == (int)TypeTransaction.Paid).CountAsync();
+
+                var paymentHistoryDto = new PaymentHistoryDto
+                {
+                    TotalPaymentHistory = totalPaymentHistory,
+                    PaymentHistoryForDay = paymentHistoryForDay
+                };
+                result.IsError = false;
+                result.Result = paymentHistoryDto;
+            }
+            catch (Exception ex)
+            {
+                result.IsError = true;
+                result.Message = ex.Message;
+            }
+            return result;
+        }
+
+        public async Task<ResultDto<TotalFinancialProductDto>> TotalFinancialProducts() 
+        { 
+         var result = new ResultDto<TotalFinancialProductDto>();
+            try 
+            {
+                int savingsAccounts = await _savingsAccountRepo.GetAllQueryAsync().CountAsync();
+                int creditCards = await _creditCardRepo.GetAllQueryAsync().CountAsync();
+                int Loans = await _loanRepo.GetAllQueryAsync().CountAsync();
+
+                int totalProductsCount = savingsAccounts + creditCards + Loans;
+
+                if(totalProductsCount == 0) 
+                {
+                    result.IsError = true;
+                    result.Message = "Aun no hay productos financieros asignados a clientes";
+                    return result;
+                }
+                var totalProducts = new TotalFinancialProductDto
+                {
+                    TotalFinancialProductsCount = totalProductsCount,
+                };
+             
+                result.IsError = false;
+                result.Result = totalProducts;
+            } 
+            catch(Exception ex) 
+            { 
+                result.IsError = true;
+                result.Message = ex.Message;
+
+            }
+            return result;
+        }
+
+        public async Task<ResultDto<LoanAverageClientDto>> AverageLoansPerClient()
+        {
+            var result = new ResultDto<LoanAverageClientDto>();
+            try
+            {
+                var clients = await _clientForApi.GetAllUser(isActive: true);
+                int totalClients = clients.Count;
+
+                if (totalClients == 0)
+                {
+                    result.IsError = true;
+                    result.Message = "No hay clientes activos registrados.";
+                    return result;
+                }
+
+                decimal totalDebt = 0;
+
+                var activeLoans = await _loanRepo.GetAllListIncluideAsync(new List<string> { "Installments" });
+                var activeLoansFiltered = activeLoans.Where(l => l.IsActive).ToList();
+
+                foreach (var loan in activeLoansFiltered)
+                {
+                    if (loan.Installments != null)
+                    {
+                        totalDebt += loan.Installments.Where(i => !i.IsPaid).Sum(i => i.PaymentAmount);
+                    }
+                }
+
+               
+                var activeCreditCards = await _creditCardRepo.GetAllListAsync();
+
+                totalDebt += activeCreditCards.Where(c => c.IsActive).Sum(c => c.CurrentDebt);
+
+                decimal averageDebt = totalClients > 0 ? totalDebt / totalClients : 0;
+
+                result.IsError = false;
+                result.Result = new LoanAverageClientDto
+                {
+                    AverageLoanAmount = (double)averageDebt,
+                    TotalClients = totalClients,
+                };
+            }
+            catch (Exception ex)
+            {
+                result.IsError = true;
+                result.Message = ex.Message;
+            }
+            return result;
+        }
     }
 }

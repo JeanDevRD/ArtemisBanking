@@ -1,11 +1,22 @@
 using ArtemisBanking.Infraestructure.Identity;
+using ArtemisBanking.Infraestructure.Shared;
+using ArtemisBanking.Infraestructure.Persistence;
+using ArtemisBanking.Core.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-var app = builder.Build();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+builder.Services.AddPersistenceLayer(builder.Configuration);  
+builder.Services.AddSharedLayer(builder.Configuration);        
+builder.Services.AddApplicationLayer();                        
+builder.Services.AddIdentityLayerForWebApp(builder.Configuration);
+
+
+
 
 builder.Services.AddSession(opt =>
 {
@@ -14,8 +25,8 @@ builder.Services.AddSession(opt =>
     opt.Cookie.IsEssential = true;
 });
 
-builder.Services.AddIdentityLayerForWebApp(builder.Configuration);
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+var app = builder.Build();
+
 await app.Services.RunIdentitySeedAsync();
 
 // Configure the HTTP request pipeline.
