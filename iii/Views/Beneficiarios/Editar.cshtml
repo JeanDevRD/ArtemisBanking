@@ -1,30 +1,32 @@
 ﻿@model ArtemisBanking.Core.Application.Dtos.Beneficiary.BeneficiaryDto
+
 @{
     ViewData["Title"] = "Editar Beneficiario";
 }
 
-<div class="container mt-4">
-    <h2>Editar beneficiario</h2>
-    <form asp-action="Editar" method="post">
+<div class="container mt-4 col-md-6">
+    <h3>Editar Beneficiario</h3>
+
+    <form asp-action="Editar" method="post" class="shadow-sm p-4 bg-light rounded">
         <input type="hidden" asp-for="Id" />
-        <div class="mb-3">
+
+        <div class="form-group mb-3">
             <label>Nombre</label>
-            <input asp-for="FirstName" class="form-control" />
+            <input asp-for="FirstName" class="form-control" required />
         </div>
-        <div class="mb-3">
+        <div class="form-group mb-3">
             <label>Apellido</label>
-            <input asp-for="LastName" class="form-control" />
+            <input asp-for="LastName" class="form-control" required />
         </div>
-        <div class="mb-3">
-            <label>Cédula</label>
-            <input asp-for="UserId" class="form-control" readonly />
+        <div class="form-group mb-3">
+            <label>Número de Cuenta</label>
+            <input asp-for="AccountNumber" class="form-control" maxlength="9" required />
         </div>
-        <div class="mb-3">
-            <label>Número de cuenta</label>
-            <input asp-for="AccountNumber" class="form-control" />
-        </div>
-        <button type="submit" class="btn btn-primary">Guardar cambios</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+
+        <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
+        <a asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">Cancelar</a>
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger mt-2" })
     </form>
 </div>
 

@@ -1,61 +1,90 @@
-﻿@model ArtemisBanking.Core.Application.ViewModels.Transacciones.TransaccionFiltroViewModel
+﻿@model List<ArtemisBanking.Core.Application.Dtos.Transaction.TransactionDto>
 @{
-    ViewData["Title"] = "Historial de transacciones";
+    ViewData["Title"] = "Historial de Transacciones";
 }
 
 <div class="container mt-4">
-    <h2>Historial de Transacciones</h2>
+    <h3>Historial de Transacciones</h3>
 
     <form method="get" class="row g-3 mb-4">
-        <div class="col-md-2">
-            <input name="buscar" class="form-control" placeholder="Buscar..." value="@Model.Buscar" />
+        <div class="col-md-3">
+            <input type="text" name="filtro" value="@ViewBag.Filtro" placeholder="Buscar por monto, referencia o descripción" class="form-control" />
         </div>
         <div class="col-md-2">
-            <input name="desde" type="date" class="form-control" value="@Model.FechaDesde?.ToString("yyyy-MM-dd")" />
+            <input type="date" name="desde" value="@ViewBag.Desde" class="form-control" />
         </div>
         <div class="col-md-2">
-            <input name="hasta" type="date" class="form-control" value="@Model.FechaHasta?.ToString("yyyy-MM-dd")" />
+            <input type="date" name="hasta" value="@ViewBag.Hasta" class="form-control" />
         </div>
         <div class="col-md-2">
             <select name="tipo" class="form-select">
                 <option value="">Tipo</option>
-                <option value="1" selected="@(Model.Tipo == "1")">Crédito</option>
-                <option value="2" selected="@(Model.Tipo == "2")">Débito</option>
+                <option value="1" selected="@(ViewBag.Tipo=="1")">Débito</option>
+                <option value="2" selected="@(ViewBag.Tipo=="2")">Crédito</option>
             </select>
         </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary">Filtrar</button>
-        </div>
-        <div class="col-md-2 text-end">
-            <a asp-action="ExportarExcel" class="btn btn-success me-2">Excel</a>
-            <a asp-action="ExportarPdf" class="btn btn-danger">PDF</a>
+        <div class="col-md-3 d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+            <a asp-action="ExportarPDF" class="btn btn-danger me-2">PDF</a>
+            <a asp-action="ExportarExcel" class="btn btn-success">Excel</a>
         </div>
     </form>
 
-    <table class="table table-striped table-hover">
-        <thead>
+    <table class="table table-hover shadow-sm">
+        <thead class="table-dark">
             <tr>
                 <th>Fecha</th>
                 <th>Tipo</th>
                 <th>Origen</th>
-                <th>Beneficiario</th>
+                <th>Destino</th>
                 <th>Monto</th>
                 <th>Estado</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var t in Model.Transacciones)
+            @foreach (var t in Model)
             {
                 <tr>
-                    <td>@t.Date.ToString("dd/MM/yyyy")</td>
+                    <td>@t.Date.ToShortDateString()</td>
                     <td>@t.Type</td>
                     <td>@t.Source</td>
                     <td>@t.Beneficiary</td>
-                    <td>@t.Amount.ToString("C")</td>
+                    <td>@t.Amount.ToString("C2")</td>
                     <td>@t.Status</td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detalleModal" data-id="@t.Id">
+                            Ver detalle
+                        </button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
+
+<!-- Modal de detalle -->
+<div class="modal fade" id="detalleModal" tabindex="-1" aria-labelledby="detalleLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detalleLabel">Detalle de la transacción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detalleBody">
+                <p class="text-center text-muted">Cargando...</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $('#detalleModal').on('show.bs.modal', function (event) {
+            const button = $(event.relatedTarget);
+            const id = button.data('id');
+            $("#detalleBody").load(`/Transacciones/Detalle/${id}`);
+        });
+    </script>
+}
 

@@ -1,4 +1,5 @@
-﻿using ArtemisBanking.Infraestructure.Persistence.Contexts;
+﻿using ArtemisBanking.Core.Domain.Interfaces; // ✅ Agregada
+using ArtemisBanking.Infraestructure.Persistence.Contexts;
 using ArtemisBanking.Infraestructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,7 +9,7 @@ namespace ArtemisBanking.Infraestructure.Persistence
 {
     public static class ServiceRegistration
     {
-        public static void AddPersistenceLayer(this IServiceCollection services, IConfiguration confi) 
+        public static void AddPersistenceLayer(this IServiceCollection services, IConfiguration confi)
         {
             #region Context
             var connectionString = confi.GetConnectionString("DefaultConnection");

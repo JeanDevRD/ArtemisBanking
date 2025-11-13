@@ -1,15 +1,17 @@
-﻿using ArtemisBanking.Core.Application.Interfaces;
-using ArtemisBanking.Core.Application.ViewModels.Transacciones;
+﻿using ArtemisBanking.Core.Application.Dtos.Transaction;
+using ArtemisBanking.Core.Application.Interfaces;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
-using System.Reflection.Metadata;
+using System.Globalization;
+using System.IO;
+using System.Security.Claims;
 
 namespace ArtemisBankingWebApp.Controllers
 {
-    [Authorize(Roles = "cliente")]
+    [Authorize(Roles = "Cliente")]
     public class TransaccionesController : Controller
     {
         private readonly ITransactionService _transactionService;
@@ -19,126 +21,147 @@ namespace ArtemisBankingWebApp.Controllers
             _transactionService = transactionService;
         }
 
-        public async Task<IActionResult> Index(string? tipo, string? producto, DateTime? desde, DateTime? hasta, string? buscar, int page = 1)
+        public async Task<IActionResult> Index(string filtro = "", string tipo = "", DateTime? desde = null, DateTime? hasta = null)
         {
-            var lista = await _transactionService.GetAllAsync();
-            var query = lista.AsQueryable();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var transacciones = await _transactionService.GetAllAsync();
 
-            if (!string.IsNullOrEmpty(tipo))
-                query = query.Where(t => t.Type.ToString() == tipo);
-
-            if (desde.HasValue)
-                query = query.Where(t => t.Date >= desde.Value);
-            if (hasta.HasValue)
-                query = query.Where(t => t.Date <= hasta.Value);
-
-            if (!string.IsNullOrEmpty(buscar))
-                query = query.Where(t =>
-                    t.Source.Contains(buscar, StringComparison.OrdinalIgnoreCase) ||
-                    t.Beneficiary.Contains(buscar, StringComparison.OrdinalIgnoreCase) ||
-                    t.Amount.ToString().Contains(buscar));
-
-            const int pageSize = 20;
-            var paginated = query
+            // Filtrar por usuario
+            var lista = transacciones
+                .Where(t => t.SavingsAccount?.UserId == userId)
                 .OrderByDescending(t => t.Date)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
                 .ToList();
 
-            var vm = new TransaccionFiltroViewModel
-            {
-                Transacciones = paginated,
-                Tipo = tipo,
-                Producto = producto,
-                FechaDesde = desde,
-                FechaHasta = hasta,
-                Buscar = buscar
-            };
+            // Filtros
+            if (!string.IsNullOrEmpty(filtro))
+                lista = lista.Where(t =>
+                    t.Beneficiary.Contains(filtro, StringComparison.OrdinalIgnoreCase) ||
+                    t.Amount.ToString().Contains(filtro) ||
+                    t.Source.Contains(filtro, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
 
-            return View(vm);
+            if (!string.IsNullOrEmpty(tipo))
+                lista = lista.Where(t => t.Type.ToString() == tipo).ToList();
+
+            if (desde.HasValue)
+                lista = lista.Where(t => t.Date >= desde.Value).ToList();
+
+            if (hasta.HasValue)
+                lista = lista.Where(t => t.Date <= hasta.Value).ToList();
+
+            ViewBag.Filtro = filtro;
+            ViewBag.Tipo = tipo;
+            ViewBag.Desde = desde?.ToString("yyyy-MM-dd");
+            ViewBag.Hasta = hasta?.ToString("yyyy-MM-dd");
+
+            return View(lista.Take(20).ToList());
+        }
+
+        public async Task<IActionResult> Detalle(int id)
+        {
+            var transaccion = await _transactionService.GetByIdAsync(id);
+            if (transaccion == null)
+                return NotFound();
+
+            return PartialView("_Detalle", transaccion);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ExportarExcel()
+        public async Task<IActionResult> ExportarPDF(string filtro = "", string tipo = "", DateTime? desde = null, DateTime? hasta = null)
         {
-            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+            var transacciones = await _transactionService.GetAllAsync();
+            var lista = Filtrar(transacciones, filtro, tipo, desde, hasta);
 
-            var lista = await _transactionService.GetAllAsync();
-            using var package = new ExcelPackage();
-            var hoja = package.Workbook.Worksheets.Add("Transacciones");
-
-            hoja.Cells[1, 1].Value = "Fecha";
-            hoja.Cells[1, 2].Value = "Tipo";
-            hoja.Cells[1, 3].Value = "Origen";
-            hoja.Cells[1, 4].Value = "Beneficiario";
-            hoja.Cells[1, 5].Value = "Monto";
-            hoja.Cells[1, 6].Value = "Estado";
-
-            int fila = 2;
-            foreach (var t in lista)
+            using (var stream = new MemoryStream())
             {
-                hoja.Cells[fila, 1].Value = t.Date.ToString("dd/MM/yyyy");
-                hoja.Cells[fila, 2].Value = t.Type;
-                hoja.Cells[fila, 3].Value = t.Source;
-                hoja.Cells[fila, 4].Value = t.Beneficiary;
-                hoja.Cells[fila, 5].Value = t.Amount;
-                hoja.Cells[fila, 6].Value = t.Status;
-                fila++;
-            }
+                Document pdf = new Document(PageSize.A4);
+                PdfWriter.GetInstance(pdf, stream);
+                pdf.Open();
 
-            var stream = new MemoryStream(package.GetAsByteArray());
-            return File(stream, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Transacciones.xlsx");
+                var fontTitle = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 16);
+                var fontHeader = FontFactory.GetFont(FontFactory.HELVETICA_BOLD, 12);
+                var fontRow = FontFactory.GetFont(FontFactory.HELVETICA, 10);
+
+                pdf.Add(new Paragraph("Historial de Transacciones", fontTitle));
+                pdf.Add(new Paragraph($"Generado el {DateTime.Now.ToString("dd/MM/yyyy HH:mm")}\n\n"));
+
+                PdfPTable table = new PdfPTable(6);
+                table.AddCell(new Phrase("Fecha", fontHeader));
+                table.AddCell(new Phrase("Tipo", fontHeader));
+                table.AddCell(new Phrase("Origen", fontHeader));
+                table.AddCell(new Phrase("Destino", fontHeader));
+                table.AddCell(new Phrase("Monto", fontHeader));
+                table.AddCell(new Phrase("Estado", fontHeader));
+
+                foreach (var t in lista)
+                {
+                    table.AddCell(new Phrase(t.Date.ToShortDateString(), fontRow));
+                    table.AddCell(new Phrase(t.Type.ToString(), fontRow));
+                    table.AddCell(new Phrase(t.Source, fontRow));
+                    table.AddCell(new Phrase(t.Beneficiary, fontRow));
+                    table.AddCell(new Phrase(t.Amount.ToString("C2"), fontRow));
+                    table.AddCell(new Phrase(t.Status.ToString(), fontRow));
+                }
+
+                pdf.Add(table);
+                pdf.Close();
+
+                return File(stream.ToArray(), "application/pdf", "Transacciones.pdf");
+            }
         }
+
         [HttpGet]
-        public async Task<IActionResult> ExportarPdf()
+        public async Task<IActionResult> ExportarExcel(string filtro = "", string tipo = "", DateTime? desde = null, DateTime? hasta = null)
         {
-            var lista = await _transactionService.GetAllAsync();
-            using var stream = new MemoryStream();
+            var transacciones = await _transactionService.GetAllAsync();
+            var lista = Filtrar(transacciones, filtro, tipo, desde, hasta);
 
-            var documento = new iTextSharp.text.Document(iTextSharp.text.PageSize.A4, 25, 25, 25, 25);
-            PdfWriter.GetInstance(documento, stream);
-            documento.Open();
-
-            // ✅ Crear fuente correctamente con FontFactory
-            var fuenteTitulo = iTextSharp.text.FontFactory.GetFont("Helvetica", 16, iTextSharp.text.Font.BOLD);
-            var fuenteNormal = iTextSharp.text.FontFactory.GetFont("Helvetica", 11, iTextSharp.text.Font.NORMAL);
-
-            var titulo = new iTextSharp.text.Paragraph("Historial de Transacciones", fuenteTitulo)
+            using (var package = new ExcelPackage())
             {
-                Alignment = iTextSharp.text.Element.ALIGN_CENTER
-            };
-            documento.Add(titulo);
-            documento.Add(new iTextSharp.text.Paragraph(" ", fuenteNormal));
+                var sheet = package.Workbook.Worksheets.Add("Transacciones");
+                sheet.Cells[1, 1].Value = "Fecha";
+                sheet.Cells[1, 2].Value = "Tipo";
+                sheet.Cells[1, 3].Value = "Origen";
+                sheet.Cells[1, 4].Value = "Destino";
+                sheet.Cells[1, 5].Value = "Monto";
+                sheet.Cells[1, 6].Value = "Estado";
 
-            var tabla = new iTextSharp.text.pdf.PdfPTable(5)
-            {
-                WidthPercentage = 100
-            };
+                int row = 2;
+                foreach (var t in lista)
+                {
+                    sheet.Cells[row, 1].Value = t.Date.ToShortDateString();
+                    sheet.Cells[row, 2].Value = t.Type.ToString();
+                    sheet.Cells[row, 3].Value = t.Source;
+                    sheet.Cells[row, 4].Value = t.Beneficiary;
+                    sheet.Cells[row, 5].Value = t.Amount;
+                    sheet.Cells[row, 6].Value = t.Status;
+                    row++;
+                }
 
-            // Encabezados
-            tabla.AddCell(new iTextSharp.text.Phrase("Fecha", fuenteNormal));
-            tabla.AddCell(new iTextSharp.text.Phrase("Tipo", fuenteNormal));
-            tabla.AddCell(new iTextSharp.text.Phrase("Origen", fuenteNormal));
-            tabla.AddCell(new iTextSharp.text.Phrase("Beneficiario", fuenteNormal));
-            tabla.AddCell(new iTextSharp.text.Phrase("Monto", fuenteNormal));
-
-            // Filas
-            foreach (var t in lista)
-            {
-                tabla.AddCell(new iTextSharp.text.Phrase(t.Date.ToString("dd/MM/yyyy"), fuenteNormal));
-                tabla.AddCell(new iTextSharp.text.Phrase(t.Type.ToString(), fuenteNormal));
-                tabla.AddCell(new iTextSharp.text.Phrase(t.Source, fuenteNormal));
-                tabla.AddCell(new iTextSharp.text.Phrase(t.Beneficiary, fuenteNormal));
-                tabla.AddCell(new iTextSharp.text.Phrase(t.Amount.ToString("C"), fuenteNormal));
+                return File(package.GetAsByteArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Transacciones.xlsx");
             }
-
-            documento.Add(tabla);
-            documento.Close();
-
-            stream.Position = 0;
-            return File(stream.ToArray(), "application/pdf", "Transacciones.pdf");
         }
 
+        private List<TransactionDto> Filtrar(List<TransactionDto> lista, string filtro, string tipo, DateTime? desde, DateTime? hasta)
+        {
+            if (!string.IsNullOrEmpty(filtro))
+                lista = lista.Where(t =>
+                    t.Beneficiary.Contains(filtro, StringComparison.OrdinalIgnoreCase) ||
+                    t.Amount.ToString().Contains(filtro) ||
+                    t.Source.Contains(filtro, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
 
+            if (!string.IsNullOrEmpty(tipo))
+                lista = lista.Where(t => t.Type.ToString() == tipo).ToList();
+
+            if (desde.HasValue)
+                lista = lista.Where(t => t.Date >= desde.Value).ToList();
+
+            if (hasta.HasValue)
+                lista = lista.Where(t => t.Date <= hasta.Value).ToList();
+
+            return lista;
+        }
     }
 }
+

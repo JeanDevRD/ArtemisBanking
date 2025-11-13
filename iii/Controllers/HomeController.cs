@@ -1,4 +1,3 @@
-
 using ArtemisBanking.Core.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,7 +28,6 @@ namespace ArtemisBankingWebApp.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             var cuentas = await _savingsAccountService.GetAllAsync();
             var prestamos = await _loanService.GetAllAsync();
             var tarjetas = await _creditCardService.GetAllAsync();
@@ -38,15 +36,17 @@ namespace ArtemisBankingWebApp.Controllers
             var misCuentas = cuentas.Where(c => c.UserId == userId).ToList();
             var misPrestamos = prestamos.Where(p => p.UserId == userId).ToList();
             var misTarjetas = tarjetas.Where(t => t.UserId == userId).ToList();
-            var misTransacciones = transacciones.Where(t => t.SavingsAccount?.UserId == userId)
-                                                .OrderByDescending(t => t.Date)
-                                                .Take(5)
-                                                .ToList();
+            var misTransacciones = transacciones
+                .Where(t => t.SavingsAccount?.UserId == userId)
+                .OrderByDescending(t => t.Date)
+                .Take(5)
+                .ToList();
 
             // Calcular totales
             decimal saldoTotal = misCuentas.Sum(c => c.Balance);
             decimal deudaTotal = misTarjetas.Sum(t => t.CurrentDebt) + misPrestamos.Sum(p => p.Amount);
-            decimal proximoPagoMinimo = misPrestamos.Sum(p => p.Installments?.FirstOrDefault(i => !i.IsPaid)?.Amount ?? 0);
+            decimal proximoPagoMinimo = misPrestamos
+                .Sum(p => p.Installments?.FirstOrDefault(i => !i.IsPaid)?.Amount ?? 0);
 
             ViewBag.SaldoTotal = saldoTotal.ToString("C2");
             ViewBag.DeudaTotal = deudaTotal.ToString("C2");
@@ -61,6 +61,13 @@ namespace ArtemisBankingWebApp.Controllers
             };
 
             return View(productos);
+        }
+
+        // Método para acceso denegado - permite acceso anónimo
+        [AllowAnonymous]
+        public IActionResult AccesoDenegado()
+        {
+            return RedirectToAction("AccesoDenegado", "Auth");
         }
     }
 }
