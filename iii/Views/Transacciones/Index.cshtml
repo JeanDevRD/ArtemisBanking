@@ -1,0 +1,61 @@
+﻿@model ArtemisBanking.Core.Application.ViewModels.Transacciones.TransaccionFiltroViewModel
+@{
+    ViewData["Title"] = "Historial de transacciones";
+}
+
+<div class="container mt-4">
+    <h2>Historial de Transacciones</h2>
+
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-2">
+            <input name="buscar" class="form-control" placeholder="Buscar..." value="@Model.Buscar" />
+        </div>
+        <div class="col-md-2">
+            <input name="desde" type="date" class="form-control" value="@Model.FechaDesde?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-2">
+            <input name="hasta" type="date" class="form-control" value="@Model.FechaHasta?.ToString("yyyy-MM-dd")" />
+        </div>
+        <div class="col-md-2">
+            <select name="tipo" class="form-select">
+                <option value="">Tipo</option>
+                <option value="1" selected="@(Model.Tipo == "1")">Crédito</option>
+                <option value="2" selected="@(Model.Tipo == "2")">Débito</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+        <div class="col-md-2 text-end">
+            <a asp-action="ExportarExcel" class="btn btn-success me-2">Excel</a>
+            <a asp-action="ExportarPdf" class="btn btn-danger">PDF</a>
+        </div>
+    </form>
+
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Origen</th>
+                <th>Beneficiario</th>
+                <th>Monto</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model.Transacciones)
+            {
+                <tr>
+                    <td>@t.Date.ToString("dd/MM/yyyy")</td>
+                    <td>@t.Type</td>
+                    <td>@t.Source</td>
+                    <td>@t.Beneficiary</td>
+                    <td>@t.Amount.ToString("C")</td>
+                    <td>@t.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
