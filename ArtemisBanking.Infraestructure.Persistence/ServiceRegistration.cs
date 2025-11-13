@@ -11,7 +11,7 @@ namespace ArtemisBanking.Infraestructure.Persistence
         public static void AddPersistenceLayer(this IServiceCollection services, IConfiguration confi) 
         {
             #region Context
-            var connectionString = confi.GetConnectionString("ConnectionStrings");
+            var connectionString = confi.GetConnectionString("DefaultConnection");
             services.AddDbContext<ArtemisBankingContextSqlServer>((serviceProvider, opt) =>
             {
                 opt.EnableSensitiveDataLogging();

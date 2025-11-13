@@ -241,11 +241,8 @@ namespace ArtemisBanking.Core.Application.Services
                     return result;
                 }
 
-                var monthlyIncome = await _loanRepository.GetAllQueryAsync()
-                    .Where(l => l.UserId == user.Id)
-                    .SelectMany(l => l.Installments!)
-                    .Where(i => !i.IsPaid)
-                    .SumAsync(i => i.PaymentAmount);
+                var monthlyIncome = await _loanRepository.GetAllQueryAsync().Where(l => l.UserId == user.Id)
+                    .SelectMany(l => l.Installments!).Where(i => !i.IsPaid).SumAsync(i => i.PaymentAmount);
 
                 var dto = _mapper.Map<ElegibleUserForLoanDto>(user);
                 dto.FullName = $"{user.FirstName} {user.LastName}";
@@ -340,18 +337,13 @@ namespace ArtemisBanking.Core.Application.Services
                     return result;
                 }
 
-                var loansDto = loansList.Select(loan => new LoanListDto
+                var loansDto = _mapper.Map<List<LoanListDto>>(loansList);
+
+              
+                foreach (var loanDto in loansDto)
                 {
-                    LoanId = loan.Id,
-                    ClientFullName = $"{client.FirstName} {client.LastName}",
-                    CapitalAmount = loan.Amount,
-                    TotalInstallments = loan.Installments?.Count ?? 0,
-                    PaidInstallments = loan.Installments?.Count(i => i.IsPaid) ?? 0,
-                    OutstandingAmount = loan.Installments?.Where(i => !i.IsPaid).Sum(i => i.PaymentAmount) ?? 0,
-                    InterestRate = loan.AnnualInterestRate,
-                    TermInMonths = loan.TermMonths,
-                    PaymentStatus = loan.Installments != null && loan.Installments.Any(i => i.IsLate) ? "En mora" : "Al día"
-                }).ToList();
+                    loanDto.ClientFullName = $"{client.FirstName} {client.LastName}";
+                }
 
                 result.IsError = false;
                 result.Result = loansDto;
@@ -365,7 +357,150 @@ namespace ArtemisBanking.Core.Application.Services
             return result;
         }
 
+        public async Task<ResultDto<LoanDetailDto>> GetLoanDetailAsync(int loanId)
+        {
+            var result = new ResultDto<LoanDetailDto>();
+            try
+            {
+                var loan = await _loanRepository.GetQueryWithIncluide(new List<string>{ "Installments" })
+                    .FirstOrDefaultAsync(l => l.Id == loanId);
 
+                if (loan == null)
+                {
+                    result.IsError = true;
+                    result.Message = "Préstamo no encontrado";
+                    return result;
+                }
+
+                var client = await _clientApp.GetUserById(loan.UserId);
+
+                if (client == null)
+                {
+                    result.IsError = true;
+                    result.Message = "Cliente no encontrado";
+                    return result;
+                }
+
+                var loanDetail = _mapper.Map<LoanDetailDto>(loan);
+
+                loanDetail.ClientFullName = $"{client.FirstName} {client.LastName}";
+
+                result.IsError = false;
+                result.Result = loanDetail;
+            }
+            catch (Exception ex)
+            {
+                result.IsError = true;
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+        public async Task<ResultDto<LoanDto>> UpdateInterestRateAsync(int loanId, decimal newAnnualInterestRate)
+        {
+            var result = new ResultDto<LoanDto>();
+            try
+            {
+                var loan = await _loanRepository.GetAllQueryAsync()
+                    .Include(l => l.Installments)
+                    .FirstOrDefaultAsync(l => l.Id == loanId);
+
+                if (loan == null)
+                {
+                    result.IsError = true;
+                    result.Message = "Préstamo no encontrado";
+                    return result;
+                }
+
+                if (!loan.IsActive)
+                {
+                    result.IsError = true;
+                    result.Message = "No se puede modificar un préstamo inactivo";
+                    return result;
+                }
+
+                var client = await _clientApp.GetUserById(loan.UserId);
+
+                if (client == null)
+                {
+                    result.IsError = true;
+                    result.Message = "Cliente no encontrado";
+                    return result;
+                }
+
+              
+                var today = DateTime.UtcNow.Date;
+                var futureInstallments = loan.Installments?
+                    .Where(i => !i.IsPaid && i.PaymentDate.Date > today).OrderBy(i => i.PaymentDate)
+                    .ToList();
+
+                if (futureInstallments == null || !futureInstallments.Any())
+                {
+                    result.IsError = true;
+                    result.Message = "No hay cuotas futuras para recalcular";
+                    return result;
+                }
+
+                var paidInstallments = loan.Installments?.Count(i => i.IsPaid) ?? 0;
+                var totalInstallments = loan.TermMonths;
+                var remainingInstallments = futureInstallments.Count;
+
+               
+                var newMonthlyRate = newAnnualInterestRate / 12 / 100;
+
+                var remainingCapital = CalculateRemainingCapital(
+                    loan.Amount,
+                    loan.AnnualInterestRate / 12 / 100,
+                    totalInstallments,
+                    paidInstallments
+                );
+
+                var pow = Pow(1 + newMonthlyRate, remainingInstallments);
+                var newPaymentAmount = remainingCapital * (newMonthlyRate * pow) / (pow - 1);
+                newPaymentAmount = Math.Round(newPaymentAmount, 2, MidpointRounding.AwayFromZero);
+
+                foreach (var installment in futureInstallments)
+                {
+                    installment.PaymentAmount = newPaymentAmount;
+                }
+
+                loan.AnnualInterestRate = newAnnualInterestRate;
+
+                await _loanRepository.UpdateAsync(loan.Id,loan);
+
+                await _emailService.SendAsync(new EmailRequestDto
+                {
+                    To = client.Email,
+                    Subject = "Actualización de tasa de interés - Artemis Banking",
+                    HtmlBody = $@"
+                    <h3>Estimado {client.FirstName},</h3>
+                    <p>Le informamos que la tasa de interés de su préstamo ha sido actualizada.</p>
+                    <ul>
+                    <li>Nueva tasa de interés anual: {newAnnualInterestRate}%</li>
+                    <li>Nueva cuota mensual: {newPaymentAmount:C}</li>
+                    <li>Cuotas afectadas: {remainingInstallments}</li>
+                    </ul>
+                    <p>Esta actualización aplica únicamente a las cuotas pendientes de pago.</p>
+                    <p>Gracias por confiar en Artemis Banking.</p>"
+                });
+
+                var updatedLoan = _mapper.Map<LoanDto>(loan);
+
+                result.IsError = false;
+                result.Result = updatedLoan;
+                result.Message = "Tasa de interés actualizada exitosamente";
+            }
+            catch (Exception ex)
+            {
+                result.IsError = true;
+                result.Message = ex.Message;
+            }
+
+            return result;
+        }
+
+     
         #region Private Methods 
         private string GenerateLoanNumber()
         {
@@ -404,6 +539,26 @@ namespace ArtemisBanking.Core.Application.Services
                 result *= baseValue;
             }
             return result;
+        }
+
+        private decimal CalculateRemainingCapital(decimal initialCapital, decimal monthlyRate, int totalInstallments, int paidInstallments)
+        {
+            if (paidInstallments == 0)
+                return initialCapital;
+
+            var pow = Pow(1 + monthlyRate, totalInstallments);
+            var monthlyPayment = initialCapital * (monthlyRate * pow) / (pow - 1);
+
+            decimal remainingCapital = initialCapital;
+
+            for (int i = 1; i <= paidInstallments; i++)
+            {
+                var interest = remainingCapital * monthlyRate;
+                var principal = monthlyPayment - interest;
+                remainingCapital -= principal;
+            }
+
+            return remainingCapital;
         }
 
         #endregion

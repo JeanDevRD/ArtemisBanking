@@ -1,4 +1,5 @@
-﻿using ArtemisBanking.Core.Application.Dtos.SavingsAccount;
+﻿using ArtemisBanking.Core.Application.Dtos.Common;
+using ArtemisBanking.Core.Application.Dtos.SavingsAccount;
 
 namespace ArtemisBanking.Core.Application.Interfaces
 {
@@ -6,5 +7,6 @@ namespace ArtemisBanking.Core.Application.Interfaces
     {
         Task<List<SavingsAccountDto>> GetAllWithInclude();
         Task AddBalance(string userId, decimal amount);
+        Task<ResultDto<List<SavingsAccountsHomeDto>>> GetSavingAccountHome(string? identificationNumber, int page, bool? isActive = null, int? accountType = null);
     }
 }
