@@ -12,6 +12,7 @@ namespace ArtemisBanking.Core.Application.Dtos.Transaction
         public required string Beneficiary { get; set; }
         public required int Status { get; set; } 
         public int SavingsAccountId { get; set; }
+        public required string CashierId { get; set; }
         public SavingsAccountDto SavingsAccount { get; set; } = null!;
     }
 }

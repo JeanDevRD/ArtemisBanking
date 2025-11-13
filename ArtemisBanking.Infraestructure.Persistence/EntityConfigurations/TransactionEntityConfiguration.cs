@@ -23,6 +23,7 @@ namespace ArtemisBanking.Infraestructure.Persistence.EntityConfigurations
             builder.Property(t => t.Beneficiary).IsRequired().HasMaxLength(100);
             builder.Property(t => t.Status).IsRequired().HasDefaultValue((int)StatusCardTransaction.None);
             builder.Property(t => t.SavingsAccountId).IsRequired();
+            builder.Property(t => t.CashierId).IsRequired().HasMaxLength(100);
             #endregion
         }
     }

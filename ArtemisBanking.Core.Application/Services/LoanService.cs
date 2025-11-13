@@ -1,4 +1,4 @@
-﻿using ArtemisBanking.Core.Application.Dtos.Common;
+﻿ using ArtemisBanking.Core.Application.Dtos.Common;
 using ArtemisBanking.Core.Application.Dtos.Email;
 using ArtemisBanking.Core.Application.Dtos.Installment;
 using ArtemisBanking.Core.Application.Dtos.Loan;
@@ -28,7 +28,6 @@ namespace ArtemisBanking.Core.Application.Services
 
         }
 
-        //FALTARIA EDITAR Y VER DETALLE
         public async Task<List<LoanDto>> GetAllWithInclude()
         {
             try
