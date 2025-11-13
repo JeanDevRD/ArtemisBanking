@@ -14,9 +14,7 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
         private readonly IEmailService _emailService;
         private readonly ISavingsAccountService _savingsAccountService;
 
-        protected BaseAccountService(
-            UserManager<User> userManager,
-            IEmailService emailService,
+        protected BaseAccountService(UserManager<User> userManager,IEmailService emailService,
             ISavingsAccountService savingsAccountService)
         {
             _userManager = userManager;
@@ -61,7 +59,7 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
                 UserName = saveDto.UserName,
                 EmailConfirmed = false,
                 PhoneNumber = saveDto.Phone,
-                IsActive = false // Se crea inactivo
+                IsActive = false 
             };
 
             var result = await _userManager.CreateAsync(user, saveDto.Password);
@@ -75,7 +73,6 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
 
             await _userManager.AddToRoleAsync(user, saveDto.Role);
 
-            // Si es cliente o comercio, crear cuenta de ahorro principal
             if (saveDto.Role == "Client" || saveDto.Role == "Merchant")
             {
                 var accountNumber = await GenerateUniqueAccountNumber();
@@ -94,7 +91,6 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
                 await _savingsAccountService.AddAsync(savingsAccount);
             }
 
-            // Enviar correo de confirmación
             if (isApi != null && !isApi.Value)
             {
                 string verificationUri = await GetVerificationEmailUri(user, origin ?? "");
@@ -195,7 +191,6 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
                 await _userManager.RemoveFromRolesAsync(user, rolesList.ToList());
                 await _userManager.AddToRoleAsync(user, saveDto.Role);
 
-                // Si es cliente y hay monto adicional, agregarlo a cuenta principal
                 if (saveDto.Role == "Client" && saveDto.InitialAmount > 0)
                 {
                     var accounts = await _savingsAccountService.GetAllAsync();
