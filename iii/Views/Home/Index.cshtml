@@ -1,8 +1,125 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Panel del Cliente";
+    var cuentas = Model?.Cuentas ?? new List<dynamic>();
+    var prestamos = Model?.Prestamos ?? new List<dynamic>();
+    var tarjetas = Model?.Tarjetas ?? new List<dynamic>();
+    var transacciones = ViewBag.Transacciones as IEnumerable<dynamic>;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container-fluid mt-4">
+    <h2 class="mb-4">Bienvenido a tu Panel Financiero</h2>
+
+    <!-- Resumen financiero -->
+    <div class="row text-center mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <h5>Saldo Total Disponible</h5>
+                    <h3>@ViewBag.SaldoTotal</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm bg-danger text-white">
+                <div class="card-body">
+                    <h5>Deuda Total</h5>
+                    <h3>@ViewBag.DeudaTotal</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm bg-warning text-dark">
+                <div class="card-body">
+                    <h5>Próximo Pago Mínimo</h5>
+                    <h3>@ViewBag.ProximoPago</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Productos financieros -->
+    <div class="row">
+        <div class="col-md-12">
+            <h4 class="mt-3">Mis Productos Financieros</h4>
+            <table class="table table-hover mt-2 shadow-sm">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Tipo</th>
+                        <th>Número</th>
+                        <th>Saldo / Monto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in cuentas)
+                    {
+                        <tr>
+                            <td>Cuenta de Ahorro</td>
+                            <td>@c.AccountNumber</td>
+                            <td>@c.Balance.ToString("C2")</td>
+                            <td>@(c.IsActive ? "Activa" : "Inactiva")</td>
+                        </tr>
+                    }
+                    @foreach (var p in prestamos)
+                    {
+                        <tr>
+                            <td>Préstamo</td>
+                            <td>@p.LoanNumber</td>
+                            <td>@p.Amount.ToString("C2")</td>
+                            <td>@(p.IsActive ? "Activo" : "Cerrado")</td>
+                        </tr>
+                    }
+                    @foreach (var t in tarjetas)
+                    {
+                        <tr>
+                            <td>Tarjeta de Crédito</td>
+                            <td>@t.CardNumber</td>
+                            <td>@t.CurrentDebt.ToString("C2")</td>
+                            <td>@(t.IsActive ? "Activa" : "Inactiva")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Últimas transacciones -->
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h4>Últimas 5 Transacciones</h4>
+            <table class="table table-striped shadow-sm mt-2">
+                <thead class="table-light">
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Origen</th>
+                        <th>Destino</th>
+                        <th>Monto</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (transacciones != null)
+                    {
+                        foreach (var t in transacciones)
+                        {
+                            <tr>
+                                <td>@t.Date.ToShortDateString()</td>
+                                <td>@t.Type</td>
+                                <td>@t.Source</td>
+                                <td>@t.Beneficiary</td>
+                                <td>@t.Amount.ToString("C2")</td>
+                                <td>@t.Status</td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6" class="text-center text-muted">No hay transacciones recientes</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+

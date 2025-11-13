@@ -3,6 +3,7 @@ using ArtemisBanking.Infraestructure.Shared;
 using ArtemisBanking.Infraestructure.Persistence;
 using ArtemisBanking.Core.Application;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,6 +15,8 @@ builder.Services.AddPersistenceLayer(builder.Configuration);
 builder.Services.AddSharedLayer(builder.Configuration);        
 builder.Services.AddApplicationLayer();                        
 builder.Services.AddIdentityLayerForWebApp(builder.Configuration);
+
+
 
 
 
@@ -41,6 +44,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAuthentication(); // <-- Añadida
+
+
 
 app.UseAuthorization();
 

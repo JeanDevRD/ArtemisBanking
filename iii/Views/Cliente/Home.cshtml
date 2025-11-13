@@ -1,0 +1,70 @@
+﻿@model ArtemisBanking.Core.Application.ViewModels.Cliente.ClienteHomeViewModel
+@{
+    ViewData["Title"] = "Mis productos";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Bienvenido a tu panel financiero</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Saldo total</h6>
+                    <h4 class="text-success">@Model.SaldoTotal.ToString("C")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Deuda total</h6>
+                    <h4 class="text-danger">@Model.DeudaTotal.ToString("C")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Próximo pago mínimo</h6>
+                    <h4>@Model.ProximoPagoMinimo.ToString("C")</h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Próximas cuotas</h6>
+                    <h4>@Model.ProximasCuotas.ToString("C")</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Últimas transacciones</h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Tipo</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Monto</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model.UltimasTransacciones)
+            {
+                <tr>
+                    <td>@t.Date.ToString("dd/MM/yyyy")</td>
+                    <td>@t.Type</td>
+                    <td>@t.Amount.ToString("C")</td>
+                    <td>@t.Status</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+

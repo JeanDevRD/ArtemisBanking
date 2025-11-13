@@ -1,0 +1,42 @@
+﻿@model List<ArtemisBanking.Core.Application.Dtos.Beneficiary.BeneficiaryDto>
+
+@{
+    ViewData["Title"] = "Beneficiarios";
+}
+
+<div class="container mt-4">
+    <h2>Mis beneficiarios</h2>
+    <a class="btn btn-primary mb-3" asp-action="Agregar">Agregar beneficiario</a>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Cédula</th>
+                <th>Número de cuenta</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var b in Model)
+            {
+                <tr>
+                    <td>@($"{b.FirstName} {b.LastName}")</td>
+                    <td>@b.UserId</td>
+                    <td>@b.AccountNumber</td>
+                    <td>
+                        <a class="btn btn-sm btn-warning" asp-action="Editar" asp-route-id="@b.Id">Editar</a>
+                        <a class="btn btn-sm btn-danger" asp-action="Eliminar" asp-route-id="@b.Id"
+                           onclick="return confirm('¿Seguro que deseas eliminar este beneficiario?')">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+

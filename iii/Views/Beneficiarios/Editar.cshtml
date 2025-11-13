@@ -1,0 +1,30 @@
+﻿@model ArtemisBanking.Core.Application.Dtos.Beneficiary.BeneficiaryDto
+@{
+    ViewData["Title"] = "Editar Beneficiario";
+}
+
+<div class="container mt-4">
+    <h2>Editar beneficiario</h2>
+    <form asp-action="Editar" method="post">
+        <input type="hidden" asp-for="Id" />
+        <div class="mb-3">
+            <label>Nombre</label>
+            <input asp-for="FirstName" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Apellido</label>
+            <input asp-for="LastName" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label>Cédula</label>
+            <input asp-for="UserId" class="form-control" readonly />
+        </div>
+        <div class="mb-3">
+            <label>Número de cuenta</label>
+            <input asp-for="AccountNumber" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
