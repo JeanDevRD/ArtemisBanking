@@ -251,7 +251,7 @@ namespace ArtemisBanking.Core.Application.Services
             try
             {
                 var totalPaymentHistory = await _transactionRepo.GetAllQueryAsync()
-                    .Where(x => x.TypeTransaction == (int)TypeTransaction.Paid).CountAsync();
+                    .Where(x => x.TypeTransaction == (int)TypeTransaction.CreditCardPaid && x.TypeTransaction == (int)TypeTransaction.LoanPaid).CountAsync();
 
                 if (totalPaymentHistory == 0)
                 {
@@ -260,7 +260,7 @@ namespace ArtemisBanking.Core.Application.Services
                     return result;
                 }
                 var paymentHistoryForDay = await _transactionRepo.GetAllQueryAsync()
-                .Where(x => x.Date.Date == DateTime.UtcNow.Date &&  x.TypeTransaction == (int)TypeTransaction.Paid).CountAsync();
+                .Where(x => x.Date.Date == DateTime.UtcNow.Date &&  x.TypeTransaction == (int)TypeTransaction.LoanPaid && x.TypeTransaction == (int)TypeTransaction.CreditCardPaid).CountAsync();
 
                 var paymentHistoryDto = new PaymentHistoryDto
                 {
