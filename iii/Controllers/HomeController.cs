@@ -46,7 +46,7 @@ namespace ArtemisBankingWebApp.Controllers
             // Calcular totales
             decimal saldoTotal = misCuentas.Sum(c => c.Balance);
             decimal deudaTotal = misTarjetas.Sum(t => t.CurrentDebt) + misPrestamos.Sum(p => p.Amount);
-            decimal proximoPagoMinimo = misPrestamos.Sum(p => p.Installments?.FirstOrDefault(i => !i.IsPaid)?.Amount ?? 0);
+            decimal proximoPagoMinimo = misPrestamos.Sum(p => p.Installments?.FirstOrDefault(i => !i.IsPaid)?.PaymentAmount ?? 0);
 
             ViewBag.SaldoTotal = saldoTotal.ToString("C2");
             ViewBag.DeudaTotal = deudaTotal.ToString("C2");

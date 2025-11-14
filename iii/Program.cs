@@ -17,13 +17,6 @@ builder.Services.AddApplicationLayer();
 builder.Services.AddIdentityLayerForWebApp(builder.Configuration);
 
 
-<<<<<<< HEAD
-
-
-
-
-=======
->>>>>>> 7d98239b2142fae3e55a75da7d703e6d3084a0f9
 builder.Services.AddSession(opt =>
 {
     opt.IdleTimeout = TimeSpan.FromMinutes(60);

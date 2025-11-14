@@ -1,4 +1,5 @@
-﻿using ArtemisBanking.Infraestructure.Persistence.Contexts;
+﻿using ArtemisBanking.Core.Domain.Interfaces;
+using ArtemisBanking.Infraestructure.Persistence.Contexts;
 using ArtemisBanking.Infraestructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;

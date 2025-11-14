@@ -1,4 +1,5 @@
 ﻿using ArtemisBanking.Core.Domain.Entities;
+using ArtemisBanking.Core.Domain.Interfaces;
 using ArtemisBanking.Infraestructure.Persistence.Contexts;
 
 namespace ArtemisBanking.Infraestructure.Persistence.Repositories
