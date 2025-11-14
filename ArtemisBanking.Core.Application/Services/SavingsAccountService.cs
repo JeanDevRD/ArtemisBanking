@@ -7,7 +7,6 @@ using ArtemisBanking.Infraestructure.Persistence.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Security.Principal;
 
 namespace ArtemisBanking.Core.Application.Services
 {
