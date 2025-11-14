@@ -5,6 +5,7 @@
         Withdrawal = 1, //RETIRO
         Transfer, //TRANSFERENCIA  
         Deposit, //DEPOSITO
-        Paid //PAGO
+        CreditCardPaid,
+        LoanPaid//PAGOs
     }
 }
