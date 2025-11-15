@@ -14,7 +14,7 @@ namespace ArtemisBanking.Core.Application.Interfaces
         Task<UserDto?> GetUserById(string id);
         Task<UserDto?> GetUserByUserName(string userName);
         Task<List<UserDto>> GetAllUser(bool? isActive = true);
-        Task<UserResponseDto> ConfirmAccountAsync(string userId, string token);
+        Task<string> ConfirmAccountAsync(string userId, string token);
         Task<UserDto?> GetUserByIdentificationNumber(string IdentificationNumber);
     }
 }

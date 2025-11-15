@@ -454,40 +454,29 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
             return listUsersDtos;
         }
 
-        public virtual async Task<UserResponseDto> ConfirmAccountAsync(string userId, string token)
+        public virtual async Task<string> ConfirmAccountAsync(string userId, string token)
         {
-            UserResponseDto response = new() { HasError = false, Errors = [] };
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                response.Message = "No existe una cuenta registrada con este usuario";
-                response.HasError = true;
-                return response;
+                return "There is no acccount registered with this user";
             }
 
             token = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(token));
             var result = await _userManager.ConfirmEmailAsync(user, token);
-
             if (result.Succeeded)
             {
-                user.IsActive = true;
-                await _userManager.UpdateAsync(user);
-
-                response.Message = $"Cuenta confirmada para {user.Email}. Ya puedes usar la aplicación";
-                response.HasError = false;
-                return response;
+                return $"Account confirmed for {user.Email}. You can now use the app";
             }
             else
             {
-                response.Message = $"Ocurrió un error al confirmar el correo {user.Email}";
-                response.HasError = true;
-                return response;
+                return $"An error occurred while confirming this email {user.Email}";
             }
         }
 
         #region "Protected methods"
-        protected async Task<string> GetVerificationEmailUri(User user, string origin)
+        private async Task<string> GetVerificationEmailUri(User user, string origin)
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
@@ -498,14 +487,14 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
             return verificationUri;
         }
 
-        protected async Task<string?> GetVerificationEmailToken(User user)
+        private  async Task<string?> GetVerificationEmailToken(User user)
         {
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
             return token;
         }
 
-        protected async Task<string> GetResetPasswordUri(User user, string origin)
+        private async Task<string> GetResetPasswordUri(User user, string origin)
         {
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
@@ -516,7 +505,7 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
             return resetUri;
         }
 
-        protected async Task<string?> GetResetPasswordToken(User user)
+        private async Task<string?> GetResetPasswordToken(User user)
         {
             var token = await _userManager.GeneratePasswordResetTokenAsync(user);
             token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
