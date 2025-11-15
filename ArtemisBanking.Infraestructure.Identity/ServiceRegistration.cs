@@ -62,6 +62,7 @@ namespace ArtemisBanking.Infraestructure.Identity
             });
 
             services.AddScoped<IAccountServiceForApp, AccountServiceForApp>();
+            services.AddScoped<IAccountServiceForApi, AccountServiceForApi>();
         }
 
         public static void AddIdentityLayerForWebApi(this IServiceCollection services, IConfiguration config)

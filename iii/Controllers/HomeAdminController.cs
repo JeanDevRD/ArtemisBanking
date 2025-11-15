@@ -48,7 +48,7 @@ namespace ArtemisBankingWebApp.Controllers
                 historicTransaction = _mapper.Map<HistoricTransactionViewModel>(totalTransactions.Result)
             };
 
-            return View(homeAdminViewModel);
+            return View("Index", homeAdminViewModel);
         }
 
     }

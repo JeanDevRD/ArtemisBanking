@@ -12,8 +12,8 @@
                 Préstamos promedio por cliente
             </div>
             <div class="card-body">
-                <h4>Promedio: @Model.LoanAverageClient?.AverageLoanAmount</h4>
-                <p>Total clientes: @Model.LoanAverageClient?.TotalClients</p>
+                <h4>Promedio: @Model.loanAverageClient?.AverageLoanAmount</h4>
+                <p>Total clientes: @Model.loanAverageClient?.TotalClients</p>
             </div>
         </div>
     </div>
@@ -24,8 +24,8 @@
                 Total clientes (Web App)
             </div>
             <div class="card-body">
-                <h4>Activos: @Model.ClientsViewModel?.TotalClientsActive</h4>
-                <p>Inactivos: @Model.ClientsViewModel?.TotalClientsInactive</p>
+                <h4>Activos: @Model.clientsViewModel?.TotalClientsActive</h4>
+                <p>Inactivos: @Model.clientsViewModel?.TotalClientsInactive</p>
             </div>
         </div>
     </div>
@@ -36,7 +36,7 @@
                 Tarjetas de crédito activas
             </div>
             <div class="card-body">
-                <h4>@Model.CreditCardCount?.TotalActiveCreditCard</h4>
+                <h4>@Model.creditCardCount?.TotalActiveCreditCard</h4>
             </div>
         </div>
     </div>
@@ -47,7 +47,7 @@
                 Productos financieros
             </div>
             <div class="card-body">
-                <h4>@Model.TotalFinancial?.TotalFinancialProductsCount</h4>
+                <h4>@Model.totalFinancial?.TotalFinancialProductsCount</h4>
             </div>
         </div>
     </div>
@@ -60,7 +60,7 @@
                 Cargas totales
             </div>
             <div class="card-body">
-                <h4>@Model.LoadCount?.TotalLoad</h4>
+                <h4>@Model.loadCount?.TotalLoad</h4>
             </div>
         </div>
     </div>
@@ -71,8 +71,8 @@
                 Historial de pagos
             </div>
             <div class="card-body">
-                <h4>Total: @Model.PaymentHistory?.TotalPaymentHistory</h4>
-                <p>Hoy: @Model.PaymentHistory?.PaymentHistoryForDay</p>
+                <h4>Total: @Model.paymentHistory?.TotalPaymentHistory</h4>
+                <p>Hoy: @Model.paymentHistory?.PaymentHistoryForDay</p>
             </div>
         </div>
     </div>
@@ -83,7 +83,7 @@
                 Cuentas de ahorro
             </div>
             <div class="card-body">
-                <h4>@Model.TotalSaving?.TotalSavingAccount</h4>
+                <h4>@Model.totalSaving?.TotalSavingAccount</h4>
             </div>
         </div>
     </div>
@@ -94,7 +94,7 @@
                 Transacciones históricas
             </div>
             <div class="card-body">
-                <h4>@Model.HistoricTransaction?.TotalHistoricTransactions</h4>
+                <h4>@Model.historicTransaction?.TotalHistoricTransactions</h4>
             </div>
         </div>
     </div>

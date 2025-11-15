@@ -23,7 +23,7 @@ namespace ArtemisBanking.Core.Application
             services.AddScoped<IMerchantService, MerchantService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAdminDashboardService, AdminDashboardService>();
-           
+
             #endregion
         }
     }
