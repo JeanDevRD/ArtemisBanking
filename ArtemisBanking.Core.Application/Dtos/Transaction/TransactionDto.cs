@@ -13,6 +13,8 @@ namespace ArtemisBanking.Core.Application.Dtos.Transaction
         public required int Status { get; set; } 
         public int SavingsAccountId { get; set; }
         public required string CashierId { get; set; }
+
+        public string? ComprobanteUrl { get; set; } // ← NUEVO
         public SavingsAccountDto SavingsAccount { get; set; } = null!;
     }
 }

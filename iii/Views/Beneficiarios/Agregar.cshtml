@@ -3,31 +3,53 @@
     ViewData["Title"] = "Agregar Beneficiario";
 }
 
-<div class="container mt-4">
-    <h2>Agregar beneficiario</h2>
-    <form asp-action="Agregar" method="post">
-        <div class="mb-3">
+<div class="container mt-4 col-md-6">
+    <h3>Agregar Beneficiario</h3>
+    <form asp-action="Agregar" method="post" class="shadow-sm p-4 bg-light rounded">
+        <div class="form-group mb-3">
             <label>Nombre</label>
-            <input asp-for="FirstName" class="form-control" />
+            <input asp-for="FirstName" class="form-control" required />
             <span asp-validation-for="FirstName" class="text-danger"></span>
         </div>
-        <div class="mb-3">
+        <div class="form-group mb-3">
             <label>Apellido</label>
-            <input asp-for="LastName" class="form-control" />
+            <input asp-for="LastName" class="form-control" required />
             <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
-        <div class="mb-3">
+        <div class="form-group mb-3">
             <label>Cédula</label>
-            <input asp-for="UserId" class="form-control" maxlength="11" />
+            <input asp-for="UserId" class="form-control" placeholder="000-0000000-0" required />
             <span asp-validation-for="UserId" class="text-danger"></span>
         </div>
-        <div class="mb-3">
-            <label>Número de cuenta</label>
-            <input asp-for="AccountNumber" class="form-control" maxlength="9" />
+        <div class="form-group mb-3">
+            <label>Banco</label>
+            <select asp-for="Bank" class="form-control" required>
+                <option value="">-- Seleccione un banco --</option>
+                <option value="Banco Popular">Banco Popular</option>
+                <option value="Banreservas">Banreservas</option>
+                <option value="BHD León">BHD León</option>
+                <option value="Scotiabank">Scotiabank</option>
+                <option value="Banco Santa Cruz">Banco Santa Cruz</option>
+            </select>
+            <span asp-validation-for="Bank" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-3">
+            <label>Tipo de Cuenta</label>
+            <select asp-for="AccountType" class="form-control" required>
+                <option value="">-- Seleccione tipo --</option>
+                <option value="1">Ahorro</option>
+                <option value="2">Corriente</option>
+            </select>
+            <span asp-validation-for="AccountType" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-3">
+            <label>Número de Cuenta</label>
+            <input asp-for="AccountNumber" class="form-control" maxlength="9" placeholder="9 dígitos" required />
             <span asp-validation-for="AccountNumber" class="text-danger"></span>
         </div>
-        <button type="submit" class="btn btn-success">Guardar</button>
-        <a asp-action="Index" class="btn btn-secondary">Volver</a>
+
+        <button type="submit" class="btn btn-success w-100">Guardar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">Volver</a>
     </form>
 </div>
 

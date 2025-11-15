@@ -17,6 +17,7 @@ builder.Services.AddApplicationLayer();
 builder.Services.AddIdentityLayerForWebApp(builder.Configuration);
 
 
+
 builder.Services.AddSession(opt =>
 {
     opt.IdleTimeout = TimeSpan.FromMinutes(60);
@@ -31,20 +32,21 @@ await app.Services.RunIdentitySeedAsync();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseExceptionHandler("/Shared/ErrorGeneral");
     app.UseHsts();
 }
+
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseAuthentication(); // <-- Añadida
-
-
-
+app.UseSession(); //
+app.UseAuthentication(); // FALTABA ESTO
 app.UseAuthorization();
+
+
+
 
 app.MapControllerRoute(
     name: "default",

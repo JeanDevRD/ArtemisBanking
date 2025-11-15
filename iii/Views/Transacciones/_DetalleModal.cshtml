@@ -1,1 +1,13 @@
-﻿
+﻿@model ArtemisBanking.Core.Application.Dtos.Transaction.TransactionDto
+
+<div>
+    <table class="table table-bordered">
+        <tr><th>Fecha</th><td>@Model.Date.ToString("dd/MM/yyyy HH:mm")</td></tr>
+        <tr><th>Tipo</th><td>@Model.Type</td></tr>
+        <tr><th>Origen</th><td>@Model.Source</td></tr>
+        <tr><th>Destino</th><td>@Model.Beneficiary</td></tr>
+        <tr><th>Monto</th><td>@Model.Amount.ToString("C2")</td></tr>
+        <tr><th>Estado</th><td>@Model.Status</td></tr>
+        <tr><th>Cuenta Asociada</th><td>@Model.SavingsAccount?.AccountNumber</td></tr>
+    </table>
+</div>

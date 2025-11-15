@@ -1,42 +1,62 @@
-﻿@model List<ArtemisBanking.Core.Application.Dtos.Beneficiary.BeneficiaryDto>
-
+﻿@model IPagedList<ArtemisBanking.Core.Application.Dtos.Beneficiary.BeneficiaryDto>
 @{
-    ViewData["Title"] = "Beneficiarios";
+    ViewData["Title"] = "Mis Beneficiarios";
 }
 
 <div class="container mt-4">
-    <h2>Mis beneficiarios</h2>
-    <a class="btn btn-primary mb-3" asp-action="Agregar">Agregar beneficiario</a>
-
+    <h3>Mis Beneficiarios</h3>
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">@TempData["Success"]</div>
+    }
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger">@TempData["Error"]</div>
     }
 
-    <table class="table table-striped">
-        <thead>
+    <div class="text-end mb-3">
+        <a asp-action="Agregar" class="btn btn-primary">+ Agregar Beneficiario</a>
+    </div>
+
+    <table class="table table-striped shadow-sm">
+        <thead class="table-dark">
             <tr>
-                <th>Nombre</th>
+                <th>Nombre Completo</th>
                 <th>Cédula</th>
-                <th>Número de cuenta</th>
-                <th></th>
+                <th>Banco</th>
+                <th>Tipo Cuenta</th>
+                <th>Número de Cuenta</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var b in Model)
             {
                 <tr>
-                    <td>@($"{b.FirstName} {b.LastName}")</td>
+                    <td>@b.FirstName @b.LastName</td>
                     <td>@b.UserId</td>
+                    <td>@b.Bank</td>
+                    <td><span class="badge bg-info">@b.AccountTypeName</span></td>
                     <td>@b.AccountNumber</td>
                     <td>
-                        <a class="btn btn-sm btn-warning" asp-action="Editar" asp-route-id="@b.Id">Editar</a>
-                        <a class="btn btn-sm btn-danger" asp-action="Eliminar" asp-route-id="@b.Id"
-                           onclick="return confirm('¿Seguro que deseas eliminar este beneficiario?')">Eliminar</a>
+                        <a asp-action="Editar" asp-route-id="@b.Id" class="btn btn-sm btn-warning">Editar</a>
+                        <a asp-action="Eliminar" asp-route-id="@b.Id" class="btn btn-sm btn-danger"
+                           onclick="return confirm('¿Seguro que deseas eliminar este beneficiario?');">
+                            Eliminar
+                        </a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-</div>
 
+    <!-- PAGINACIÓN -->
+    <div class="d-flex justify-content-center">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
+        new PagedListRenderOptions
+        {
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" }
+        })
+    </div>
+</div>

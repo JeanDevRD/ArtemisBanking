@@ -67,5 +67,13 @@ namespace ArtemisBankingWebApp.Controllers
 
         [AllowAnonymous]
         public IActionResult AccesoDenegado() => View();
+
+        [AllowAnonymous]
+        public IActionResult SessionExpirada()
+        {
+            TempData["Error"] = "Tu sesión ha expirado. Inicia sesión nuevamente.";
+            return RedirectToAction("Login");
+        }
+
     }
 }

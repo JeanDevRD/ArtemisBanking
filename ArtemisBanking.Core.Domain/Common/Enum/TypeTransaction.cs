@@ -1,4 +1,5 @@
-﻿namespace ArtemisBanking.Core.Domain.Common.Enum
+﻿
+namespace ArtemisBanking.Core.Domain.Common.Enum
 {
     public enum TypeTransaction
     {
@@ -9,3 +10,5 @@
         LoanPaid//PAGOs
     }
 }
+
+
