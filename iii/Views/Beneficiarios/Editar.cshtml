@@ -1,15 +1,12 @@
 ﻿@model ArtemisBanking.Core.Application.Dtos.Beneficiary.BeneficiaryDto
-
 @{
     ViewData["Title"] = "Editar Beneficiario";
 }
 
 <div class="container mt-4 col-md-6">
     <h3>Editar Beneficiario</h3>
-
     <form asp-action="Editar" method="post" class="shadow-sm p-4 bg-light rounded">
         <input type="hidden" asp-for="Id" />
-
         <div class="form-group mb-3">
             <label>Nombre</label>
             <input asp-for="FirstName" class="form-control" required />
@@ -19,14 +16,28 @@
             <input asp-for="LastName" class="form-control" required />
         </div>
         <div class="form-group mb-3">
+            <label>Banco</label>
+            <select asp-for="Bank" class="form-control" required>
+                <option value="Banco Popular" selected="@(Model.Bank == "Banco Popular")">Banco Popular</option>
+                <option value="Banreservas" selected="@(Model.Bank == "Banreservas")">Banreservas</option>
+                <option value="BHD León" selected="@(Model.Bank == "BHD León")">BHD León</option>
+                <option value="Scotiabank" selected="@(Model.Bank == "Scotiabank")">Scotiabank</option>
+                <option value="Banco Santa Cruz" selected="@(Model.Bank == "Banco Santa Cruz")">Banco Santa Cruz</option>
+            </select>
+        </div>
+        <div class="form-group mb-3">
+            <label>Tipo de Cuenta</label>
+            <select asp-for="AccountType" class="form-control" required>
+                <option value="1" selected="@(Model.AccountType == 1)">Ahorro</option>
+                <option value="2" selected="@(Model.AccountType == 2)">Corriente</option>
+            </select>
+        </div>
+        <div class="form-group mb-3">
             <label>Número de Cuenta</label>
             <input asp-for="AccountNumber" class="form-control" maxlength="9" required />
         </div>
 
         <button type="submit" class="btn btn-primary w-100">Guardar Cambios</button>
         <a asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">Cancelar</a>
-
-        @Html.ValidationSummary(true, "", new { @class = "text-danger mt-2" })
     </form>
 </div>
-

@@ -1,12 +1,10 @@
-﻿@model List<ArtemisBanking.Core.Application.Dtos.Beneficiary.BeneficiaryDto>
-
+﻿@model IPagedList<ArtemisBanking.Core.Application.Dtos.Beneficiary.BeneficiaryDto>
 @{
     ViewData["Title"] = "Mis Beneficiarios";
 }
 
 <div class="container mt-4">
     <h3>Mis Beneficiarios</h3>
-
     @if (TempData["Success"] != null)
     {
         <div class="alert alert-success">@TempData["Success"]</div>
@@ -23,8 +21,10 @@
     <table class="table table-striped shadow-sm">
         <thead class="table-dark">
             <tr>
-                <th>Nombre</th>
+                <th>Nombre Completo</th>
                 <th>Cédula</th>
+                <th>Banco</th>
+                <th>Tipo Cuenta</th>
                 <th>Número de Cuenta</th>
                 <th>Acciones</th>
             </tr>
@@ -35,6 +35,8 @@
                 <tr>
                     <td>@b.FirstName @b.LastName</td>
                     <td>@b.UserId</td>
+                    <td>@b.Bank</td>
+                    <td><span class="badge bg-info">@b.AccountTypeName</span></td>
                     <td>@b.AccountNumber</td>
                     <td>
                         <a asp-action="Editar" asp-route-id="@b.Id" class="btn btn-sm btn-warning">Editar</a>
@@ -47,4 +49,14 @@
             }
         </tbody>
     </table>
+
+    <!-- PAGINACIÓN -->
+    <div class="d-flex justify-content-center">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page }),
+        new PagedListRenderOptions
+        {
+            LiElementClasses = new[] { "page-item" },
+            PageClasses = new[] { "page-link" }
+        })
+    </div>
 </div>

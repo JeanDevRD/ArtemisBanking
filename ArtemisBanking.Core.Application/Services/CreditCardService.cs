@@ -1,5 +1,6 @@
 ﻿using ArtemisBanking.Core.Application.Dtos.Common;
 using ArtemisBanking.Core.Application.Dtos.CreditCard;
+using ArtemisBanking.Core.Application.Dtos.Email;
 using ArtemisBanking.Core.Application.Dtos.Loan;
 using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Domain.Entities;
@@ -15,13 +16,17 @@ namespace ArtemisBanking.Core.Application.Services
     public class CreditCardService : GenericService<CreditCardDto, CreditCard>, ICreditCardService
     {
         private readonly ICreditCardRepository _creditCardRepository;
+        private readonly ICardTransactionRepository _cardTransactionRepository;
+        private readonly IEmailService _emailService;
         private readonly IAccountServiceForApp _userForApp;
         private readonly IMapper _mapper;
-        public CreditCardService(ICreditCardRepository genericRepository, IMapper mapper, IAccountServiceForApp userForAp) : base(genericRepository, mapper)
+        public CreditCardService(ICreditCardRepository genericRepository, IMapper mapper, IAccountServiceForApp userForAp, ICardTransactionRepository cardTransactionRepository, IEmailService emailService) : base(genericRepository, mapper)
         {
             _creditCardRepository = genericRepository;
             _mapper = mapper;
             _userForApp = userForAp;
+            _cardTransactionRepository = cardTransactionRepository;
+            _emailService = emailService;
         }
         public override async Task<CreditCardDto> GetByIdAsync(int id)
         {
@@ -332,15 +337,103 @@ namespace ArtemisBanking.Core.Application.Services
         }
 
 
-        public async Task<ResultDto<CreditCardDto>> AddUpdateCard(CreditCardDto dto)
+        public async Task<ResultDto<CreditCardDto>> UpdateCard(UpdateCreditCardDto dto, int creditCardId)
         {
-            return null;
+            var result = new ResultDto<CreditCardDto>();
+
+            try 
+            {
+                var creditCard = await _creditCardRepository.GetByIdAsync(creditCardId);
+
+                if (creditCard == null) 
+                { 
+                    result.IsError = true;
+                    result.Message = "Tarjeta no encontrada.";
+                    return result;
+                }
+
+                if (dto.NewCreditLimit < creditCard.CurrentDebt)
+                {
+                    result.IsError = true;
+                    result.Message = "El nuevo límite no puede ser inferior a la deuda actual.";
+                    return result;
+                }
+
+                creditCard.CreditLimit = dto.NewCreditLimit;
+                var update = await _creditCardRepository.UpdateAsync(creditCard.Id, creditCard);
+                var user = await _userForApp.GetUserById(creditCard.UserId);
+                var lastDigits = update!.CardNumber.Substring(update.CardNumber.Length - 4);
+
+                await _emailService.SendAsync(new EmailRequestDto
+                {
+                    To = user!.Email,
+                    Subject = "Actualizacion de limite de credito aprobado - Artemis Banking",
+                    HtmlBody = $@"
+                                 <h3>Estimado {user.FirstName} {user.LastName},</h3>
+                                 <p>El límite de su tarje xxx-xxx-{lastDigits} ha sido modificado.
+                                    El nuevo límite aprobado es {update.CreditLimit:C}.
+                                </p>
+                                <p>Gracias por confiar en Artemis Banking.</p>"
+                });
+
+
+                result.IsError = false;
+                result.Result = _mapper.Map<CreditCardDto>(update);
+
+            }
+            catch (Exception ex)
+            {
+                result.IsError = true;
+                result.Message = ex.Message;
+            }
+
+            return result;
+
         }
 
-        public async Task<ResultDto<CreditCardDto>> AddDetailCard(CreditCardDto dto)
+        public async Task<ResultDto<CreditCardDetailDto>> DetailCard(int idCreditCard)
         {
-            return null;
+            var result = new ResultDto<CreditCardDetailDto>();
+
+            try 
+            {
+
+                var includes = new List<string> { nameof(CreditCard.CardTransactions) };
+
+                var query = _creditCardRepository.GetQueryWithIncluide(includes);
+
+                var card = await query.FirstOrDefaultAsync(c => c.Id == idCreditCard);
+
+                if (card == null)
+                {
+                    result.IsError = true;
+                    result.Message = "Tarjeta no encontrada.";
+                }
+
+                var resultDto = _mapper.Map<CreditCardDetailDto>(card);
+
+                resultDto.consumptions = card!.CardTransactions?
+                .OrderByDescending(t => t.Date)
+                .Select(t => new ConsumptionDto
+                {
+                    consumptionDate = t.Date,
+                    amount = t.Amount,
+                    merchant = string.IsNullOrEmpty(t.Merchant) ? "AVANCE" : t.Merchant,
+                    status = t.Status
+                }).ToList() ?? new List<ConsumptionDto>();
+
+                result.Result = resultDto;
+            }
+            catch(Exception ex)
+            {
+                result.IsError = true;
+                result.Message = ex.Message;
+            }
+
+            return result;
         }
+
+
 
         #region Pirvate Methods
         private string GenerarNumeroTarjeta()

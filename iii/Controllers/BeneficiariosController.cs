@@ -3,6 +3,7 @@ using ArtemisBanking.Core.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using X.PagedList.Extensions;
 
 namespace ArtemisBankingWebApp.Controllers
 {
@@ -20,17 +21,19 @@ namespace ArtemisBankingWebApp.Controllers
             _transactionService = transactionService;
         }
 
-        public async Task<IActionResult> Index()
+        // BeneficiariosController.cs
+        public async Task<IActionResult> Index(int? page)
         {
+            var pageNumber = page ?? 1;
+            var list = await _beneficiaryService.GetAllAsync();
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var beneficiarios = await _beneficiaryService.GetAllAsync();
-            var list = beneficiarios
+            var misBeneficiarios = list
                 .Where(b => b.UserId == userId)
                 .OrderBy(b => b.FirstName)
-                .Take(20)
-                .ToList();
+                .ThenBy(b => b.LastName)
+                .ToPagedList(pageNumber, 20);
 
-            return View(list);
+            return View(misBeneficiarios);
         }
 
         [HttpGet]
@@ -85,7 +88,7 @@ namespace ArtemisBankingWebApp.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            await _beneficiaryService.UpdateAsync(model, model.Id);
+            await _beneficiaryService.UpdateAsync(model.Id, model);
             TempData["Success"] = "Beneficiario actualizado correctamente.";
             return RedirectToAction(nameof(Index));
         }
@@ -107,6 +110,8 @@ namespace ArtemisBankingWebApp.Controllers
         }
     }
 }
+
+
 
 
 

@@ -1,4 +1,5 @@
-﻿using ArtemisBanking.Core.Domain.Entities;
+﻿
+using ArtemisBanking.Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,17 +9,14 @@ namespace ArtemisBanking.Infraestructure.Persistence.EntityConfigurations
     {
         public void Configure(EntityTypeBuilder<Beneficiary> builder)
         {
-            #region Basic Configuration
-            builder.HasKey(b => b.Id);
-            builder.ToTable("Beneficiaries");
-            #endregion
+            builder.Property(b => b.FirstName).HasMaxLength(50).IsRequired();
+            builder.Property(b => b.LastName).HasMaxLength(50).IsRequired();
+            builder.Property(b => b.AccountNumber).HasMaxLength(9).IsRequired();
+            builder.Property(b => b.UserId).IsRequired();
 
-            #region Property
-            builder.Property(b => b.FirstName).IsRequired().HasMaxLength(50);
-            builder.Property(b => b.LastName).IsRequired().HasMaxLength(60);
-            builder.Property(b => b.UserId).IsRequired().HasMaxLength(100);
-            builder.Property(b => b.AccountNumber).IsRequired().HasMaxLength(40);
-            #endregion
+            // NUEVOS CAMPOS
+            builder.Property(b => b.Bank).HasMaxLength(100).IsRequired();
+            builder.Property(b => b.AccountType).IsRequired();
         }
     }
 }

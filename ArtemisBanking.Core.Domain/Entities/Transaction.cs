@@ -14,6 +14,9 @@ namespace ArtemisBanking.Core.Domain.Entities
         public required string Beneficiary { get; set; }
         public required int Status { get; set; } // Si esta aprovada o rechazada 
         public int SavingsAccountId { get; set; }
+        
+        public required string CashierId { get; set; }
+
         public SavingsAccount SavingsAccount { get; set; } = null!;
     }
 }

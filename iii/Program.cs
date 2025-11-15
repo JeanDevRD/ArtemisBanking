@@ -17,13 +17,7 @@ builder.Services.AddApplicationLayer();
 builder.Services.AddIdentityLayerForWebApp(builder.Configuration);
 
 
-<<<<<<< HEAD
 
-
-
-
-=======
->>>>>>> 7d98239b2142fae3e55a75da7d703e6d3084a0f9
 builder.Services.AddSession(opt =>
 {
     opt.IdleTimeout = TimeSpan.FromMinutes(60);
@@ -47,12 +41,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseSession();              // 
-app.UseAuthentication(); // <-- Añadida
-
-
-
+app.UseSession(); //
+app.UseAuthentication(); // FALTABA ESTO
 app.UseAuthorization();
+
+
+
 
 app.MapControllerRoute(
     name: "default",
