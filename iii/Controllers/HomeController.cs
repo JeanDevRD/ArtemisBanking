@@ -97,7 +97,6 @@ namespace ArtemisBankingWebApp.Controllers
             return View(productosPaged);
         }
 
-        // Método para acceso denegado - permite acceso anónimo
         [AllowAnonymous]
         public IActionResult AccesoDenegado()
         {

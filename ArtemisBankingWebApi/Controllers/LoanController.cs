@@ -45,7 +45,10 @@ namespace ArtemisBankingWebApi.Controllers.v1
                     return Ok(new { data = loansByUser.Result });
                 }
 
-                var loansResult = await _loanService.GetAllActiveLoanAsync();
+                bool? isActiveLoan = status?.ToLower() == "completados" ? false :
+                           status?.ToLower() == "activos" ? true : null;
+
+                var loansResult = await _loanService.GetAllLoansAsync(isActiveLoan);
 
                 if (loansResult == null || loansResult.IsError || loansResult.Result == null || !loansResult.Result.Any())
                 {
@@ -60,7 +63,11 @@ namespace ArtemisBankingWebApi.Controllers.v1
                    
                     if (status.ToLower() == "completados")
                     {
-                        // TODO: Implementar filtro de completados cuando esté disponible
+                        loans = loans.Where(l => l.PaymentStatus.ToLower() == "en mora").ToList();
+                    }
+                    else if (status.ToLower() == "completados")
+                    {
+                        loans = loans.Where(l => l.TotalInstallments > 0 &&l.PaidInstallments == l.TotalInstallments).ToList();
                     }
                 }
 
