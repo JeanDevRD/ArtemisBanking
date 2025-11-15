@@ -2,10 +2,7 @@ using ArtemisBanking.Core.Application.Dtos.User;
 using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Application.ViewModels.User;
 using AutoMapper;
-using iTextSharp.text;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace ArtemisBankingWebApp.Controllers
 {
@@ -51,11 +48,12 @@ namespace ArtemisBankingWebApp.Controllers
         }
 
 
+
         [HttpPost]
         public async Task<IActionResult> Create(SaveUserViewModel vm) 
         {
-            if (!ModelState.IsValid) 
-            { 
+            if (!ModelState.IsValid)
+            {
                 return View("Create", vm);
             }
 
@@ -66,8 +64,18 @@ namespace ArtemisBankingWebApp.Controllers
             }
 
             var dto = _mapper.Map<SaveUserDto>(vm);
-             await _serviceForApp.RegisterUser(dto, vm.Password);
 
+            var origin = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+
+            var result = await _serviceForApp.RegisterUser(dto, origin, isApi: false);
+
+            if (result.HasError)
+            {
+                ModelState.AddModelError(string.Empty, result.ErrorMessage ?? "Error al crear el usuario");
+                return View("Create", vm);
+            }
+
+            TempData["Success"] = $"Usuario '{result.UserName}' creado exitosamente. Se ha enviado un correo de confirmación a {result.Email}";
             return RedirectToAction("Index");
         }
     }

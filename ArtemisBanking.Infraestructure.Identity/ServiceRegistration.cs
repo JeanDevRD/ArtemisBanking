@@ -64,7 +64,6 @@ namespace ArtemisBanking.Infraestructure.Identity
             services.AddScoped<IAccountServiceForApp, AccountServiceForApp>();
         }
 
-        // Extensión para Web API (con JWT)
         public static void AddIdentityLayerForWebApi(this IServiceCollection services, IConfiguration config)
         {
             ConfigureGeneralIdentity(services, config);
