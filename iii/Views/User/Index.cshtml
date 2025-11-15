@@ -6,6 +6,25 @@
 
 <h2 class="text-center">Gestión de usuarios</h2>
 
+<form asp-action="Index" asp-controller="User" method="get" class="row g-3 align-items-center mb-3">
+    <div class="col-auto">
+        <label for="role" class="col-form-label fw-bold">Filtrar por rol:</label>
+    </div>
+    <div class="col-auto">
+        <select id="role" name="role" class="form-select">
+            <option value="">Todos</option>
+            <option value="Admin">Admin</option>
+            <option value="Taller">Taller</option>
+            <option value="Client">Client</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">
+            <i class="bi bi-funnel"></i> Aplicar
+        </button>
+    </div>
+</form>
+
 <div class="mb-3 text-end">
     <a class="btn btn-primary" asp-action="Create" asp-controller="User"><i class="bi bi-person-plus"></i> Crear nuevo usuario</a>
 </div>
@@ -26,6 +45,7 @@ else
                 <th>Correo</th>
                 <th>Tipo de Usuario</th>
                 <th>Estado</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -46,6 +66,18 @@ else
                         else
                         {
                             <span class="badge bg-danger">Inactivo</span>
+                        }
+                    </td>
+
+                    <td>
+                        <a class="btn btn-danger" asp-action="Edit" asp-route-IdUser="@user.Id" asp-controller="User">Editar</a>
+                        @if (user.IsActive)
+                        {
+                            <a class="btn btn-danger" asp-action="IsActivatedUser" asp-route-IdUser="@user.Id" asp-route-StateUser="@user.IsActive" asp-controller="User">Desactivar</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-success" asp-action="IsActivatedUser" asp-route-IdUser="@user.Id" asp-route-StateUser="@user.IsActive" asp-controller="User">Activar</a>
                         }
                     </td>
                 </tr>

@@ -1,0 +1,24 @@
+﻿@model IsActivatedUserViewModel
+
+@{
+    ViewData["Title"] = "Activar o Desactivar usuario";
+}
+
+<h2 class="text-center mb-4">Confirmar @(Model.StateUser == true ? "activar" : "desactivar") este usuario</h2>
+<form asp-action="IsActivatedUser" asp-controller="User" method="post">
+    <input type="hidden" asp-for="IdUser" />
+
+    <input type="hidden" asp-for="StateUser" />
+
+    @if (Model.StateUser == true)
+    {
+        <button type="submit" class="btn btn-danger">Desactivar</button>
+    }
+    else
+    {
+        <button type="submit" class="btn btn-success">Activar</button>
+    }
+
+    <a asp-action="Index" class="btn btn-secondary ms-2">Volver al listado</a>
+</form>
+

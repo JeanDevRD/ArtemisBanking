@@ -11,7 +11,13 @@ namespace ArtemisBanking.Core.Application.Mapping.DtoToViewModelMapping
             CreateMap<UserDto, UserViewModel>()
                 .ReverseMap();
             
+            CreateMap<UserDto, SaveUserDto>()
+                .ReverseMap();
+            
             CreateMap<SaveUserDto, SaveUserViewModel>()
+                .ReverseMap();
+            
+            CreateMap<SaveUserDto, EditUserViewModel>()
                 .ReverseMap();
         }
     }

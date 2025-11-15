@@ -419,16 +419,11 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
             };
         }
 
-        public virtual async Task<List<UserDto>> GetAllUser(bool? isActive = true)
+        public virtual async Task<List<UserDto>> GetAllUser()
         {
-            List<UserDto> listUsersDtos = [];
+            List<UserDto> listUsersDtos = new();
 
-            var users = _userManager.Users;
-
-            if (isActive != null && isActive == true)
-            {
-                users = users.Where(w => w.EmailConfirmed && w.IsActive);
-            }
+            var users = _userManager.Users.Where(w => w.EmailConfirmed);
 
             var listUser = await users.ToListAsync();
 
@@ -467,6 +462,8 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
             var result = await _userManager.ConfirmEmailAsync(user, token);
             if (result.Succeeded)
             {
+                user.IsActive = true;
+                await _userManager.UpdateAsync(user);
                 return $"Account confirmed for {user.Email}. You can now use the app";
             }
             else
@@ -474,6 +471,34 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
                 return $"An error occurred while confirming this email {user.Email}";
             }
         }
+
+        public virtual async Task<UserDto?> SetActivated(UserDto dto)
+        {
+            var user = await _userManager.FindByIdAsync(dto.Id!);
+            if (user == null) return null;
+
+            user.IsActive = dto.IsActive;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded) return null;
+
+            var rolesList = await _userManager.GetRolesAsync(user);
+
+            return new UserDto()
+            {
+                Id = user.Id,
+                Email = user.Email ?? "",
+                LastName = user.LastName,
+                FirstName = user.FirstName,
+                UserName = user.UserName ?? "",
+                IdentificationNumber = user.IdentificationNumber,
+                Phone = user.PhoneNumber,
+                IsVerified = user.EmailConfirmed,
+                IsActive = user.IsActive,
+                Role = rolesList.FirstOrDefault() ?? ""
+            };
+        }
+
 
         #region "Protected methods"
         private async Task<string> GetVerificationEmailUri(User user, string origin)
