@@ -21,11 +21,11 @@ namespace ArtemisBanking.Core.Application.Services
         {
             try 
             {
-                var cardTransactions = await _cardTransactionRepository.GetAllListIncluideAsync(["CreditCard"]);
+                var cardTransactions = await _cardTransactionRepository.GetAllListIncluideAsync(new List<string> { "CreditCard" });
 
                 if (cardTransactions == null)
                 {
-                    return [];
+                    return new List<CardTransactionDto>();
                 }
 
                 return _mapper.Map<List<CardTransactionDto>>(cardTransactions);

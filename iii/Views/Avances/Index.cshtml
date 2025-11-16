@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Avance de Efectivo";
+}
+
+<div class="container mt-4 col-md-6">
+    <h3>Avance de Efectivo</h3>
+
+    <div class="alert alert-warning">
+        <strong>Información:</strong> Un avance de efectivo es un crédito contra el saldo disponible de su tarjeta. Incluye intereses y comisiones.
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post" class="bg-light p-4 rounded">
+                <div class="form-group mb-3">
+                    <label>Tarjeta de Crédito</label>
+                    <select name="tarjetaId" class="form-control" required>
+                        <option value="">-- Seleccione tarjeta --</option>
+                        @if (ViewBag.Tarjetas != null)
+                        {
+                            @foreach (var t in ViewBag.Tarjetas)
+                            {
+                                <option value="@t.Id">****@t.CardNumber.Substring(t.CardNumber.Length - 4) - Disponible: @(t.CreditLimit - t.CurrentDebt).ToString("C2")</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Monto Solicitado</label>
+                    <input type="number" name="monto" class="form-control" step="0.01" min="100" required placeholder="Mínimo: 100.00" />
+                    <small class="form-text text-muted">Límite Disponible: @ViewBag.LimiteDisponible?.ToString("C2")</small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Cuenta Destino (para depositar el efectivo)</label>
+                    <input type="text" class="form-control" disabled value="Se depositará en efectivo en sucursal" />
+                </div>
+
+                <div class="alert alert-info">
+                    <p class="mb-0"><strong>Comisión:</strong> 3% del monto</p>
+                    <p class="mb-0"><strong>Tasa de Interés:</strong> Según tu tarjeta</p>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Solicitar Avance</button>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>

@@ -7,7 +7,7 @@ using X.PagedList.Extensions;
 
 namespace ArtemisBankingWebApp.Controllers
 {
-    [Authorize(Roles = "Cliente")]
+    [Authorize(Roles = "cliente")]
     public class BeneficiariosController : Controller
     {
         private readonly IBeneficiaryService _beneficiaryService;
@@ -48,16 +48,24 @@ namespace ArtemisBankingWebApp.Controllers
                 return View(model);
 
             // Validar número de cuenta (9 dígitos)
-            if (model.AccountNumber.Length != 9 || !model.AccountNumber.All(char.IsDigit))
+            if (string.IsNullOrWhiteSpace(model.AccountNumber) || model.AccountNumber.Length != 9 || !model.AccountNumber.All(char.IsDigit))
             {
                 ModelState.AddModelError("", "El número de cuenta debe tener 9 dígitos numéricos.");
                 return View(model);
             }
 
-            // Validar cédula (no puede ser la del propio usuario)
-            if (await _beneficiaryService.ExistsByCedulaAsync(model.UserId))
+            // Validar cédula (no puede ser la del propio usuario si se tiene claim IdentificationNumber)
+            var currentUserCedula = User.FindFirstValue("IdentificationNumber");
+            if (!string.IsNullOrWhiteSpace(currentUserCedula) && model.Cedula == currentUserCedula)
             {
                 ModelState.AddModelError("", "No puedes registrar tu propia cédula como beneficiario.");
+                return View(model);
+            }
+
+            // Validar cédula duplicada en beneficiarios
+            if (await _beneficiaryService.ExistsByCedulaAsync(model.Cedula))
+            {
+                ModelState.AddModelError("", "Ya existe un beneficiario con esa cédula.");
                 return View(model);
             }
 
@@ -87,6 +95,21 @@ namespace ArtemisBankingWebApp.Controllers
         {
             if (!ModelState.IsValid)
                 return View(model);
+
+            // Validar número de cuenta (9 dígitos)
+            if (string.IsNullOrWhiteSpace(model.AccountNumber) || model.AccountNumber.Length != 9 || !model.AccountNumber.All(char.IsDigit))
+            {
+                ModelState.AddModelError("", "El número de cuenta debe tener 9 dígitos numéricos.");
+                return View(model);
+            }
+
+            // Validar cuenta duplicada (ignorar el propio registro)
+            var all = await _beneficiaryService.GetAllAsync();
+            if (all.Any(b => b.AccountNumber == model.AccountNumber && b.Id != model.Id))
+            {
+                ModelState.AddModelError("", "Ya existe un beneficiario con ese número de cuenta.");
+                return View(model);
+            }
 
             await _beneficiaryService.UpdateAsync(model.Id, model);
             TempData["Success"] = "Beneficiario actualizado correctamente.";
