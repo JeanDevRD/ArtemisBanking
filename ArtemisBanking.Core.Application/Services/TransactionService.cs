@@ -7,7 +7,6 @@ using ArtemisBanking.Core.Domain.Entities;
 using ArtemisBanking.Infraestructure.Persistence.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 
 
