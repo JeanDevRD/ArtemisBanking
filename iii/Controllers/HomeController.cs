@@ -8,7 +8,7 @@ using X.PagedList.Mvc.Core;
 
 namespace ArtemisBankingWebApp.Controllers
 {
-    [Authorize(Roles = "Cliente")]
+    [Authorize(Roles = "cliente")]
     public class HomeController : Controller
     {
         private readonly ISavingsAccountService _savingsAccountService;
@@ -87,12 +87,32 @@ namespace ArtemisBankingWebApp.Controllers
             decimal saldoTotal = misCuentas.Sum(c => c.Balance);
             decimal deudaTotal = misTarjetas.Sum(t => t.CurrentDebt) + misPrestamos.Sum(p => p.Amount);
             decimal proximoPago = misPrestamos
-                .Where(p => p.Installments != null)
-                .Sum(p => p.Installments.Where(i => !i.IsPaid).OrderBy(i => i.DueDate).FirstOrDefault()?.Amount ?? 0);
+                .Where(p => p.Installments != null && p.Installments.Any(i => !i.IsPaid))
+                .SelectMany(p => p.Installments!)
+                .Where(i => !i.IsPaid)
+                .OrderBy(i => i.DueDate)
+                .Select(i => i.PaymentAmount)
+                .FirstOrDefault();
+
+            // Próximas cuotas de préstamos
+            decimal proximasCuotas = misPrestamos
+                .Where(p => p.Installments != null && p.Installments.Any(i => !i.IsPaid))
+                .SelectMany(p => p.Installments!)
+                .Where(i => !i.IsPaid)
+                .OrderBy(i => i.DueDate)
+                .Select(i => i.PaymentAmount)
+                .FirstOrDefault();
+
+            // Pago mínimo de tarjetas (generalmente 5% de la deuda)
+            decimal proximoPagoMinimo = misTarjetas
+                .Where(t => t.CurrentDebt > 0)
+                .Sum(t => t.CurrentDebt * 0.05m);
 
             ViewBag.SaldoTotal = saldoTotal.ToString("C2");
             ViewBag.DeudaTotal = deudaTotal.ToString("C2");
             ViewBag.ProximoPago = proximoPago.ToString("C2");
+            ViewBag.ProximoPagoMinimo = proximoPagoMinimo.ToString("C2");
+            ViewBag.ProximasCuotas = proximasCuotas.ToString("C2");
 
             return View(productosPaged);
         }
