@@ -68,7 +68,7 @@ namespace ArtemisBankingWebApp.Controllers
                 return RedirectToAction("Index", "Merchant");
 
             await _signInManager.SignOutAsync();
-            return RedirectToAction("AccesoDenegado");
+            return RedirectToAction("AccessDenied");
         }
 
         [Authorize]
@@ -77,12 +77,9 @@ namespace ArtemisBankingWebApp.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Login");
         }
+        public IActionResult AccessDenied() => View();
 
-        [AllowAnonymous]
-        public IActionResult AccesoDenegado() => View();
-
-        [AllowAnonymous]
-        public IActionResult SessionExpirada()
+        public IActionResult SessionExpired()
         {
             TempData["Error"] = "Tu sesión ha expirado. Inicia sesión nuevamente.";
             return RedirectToAction("Login");

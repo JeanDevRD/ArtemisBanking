@@ -39,7 +39,7 @@ namespace ArtemisBankingWebApp.Controllers
 
             if (loansResult.IsError || loansResult.Result == null || loansResult.Result.Count == 0)
             {
-                TempData["Error"] = loansResult.Message ?? "No se encontraron préstamos";
+
                 return View("Index", new StaticPagedList<LoanListViewModel>(new List<LoanListViewModel>(),
                     pageNumber,
                     pageSize,
@@ -79,6 +79,7 @@ namespace ArtemisBankingWebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
+                TempData["Error"] = "Valores no validos, intentelo denuevo";
                 return View("Create", vm);
             }
 
@@ -88,7 +89,7 @@ namespace ArtemisBankingWebApp.Controllers
 
             if (result.IsError)
             {
-                ModelState.AddModelError(string.Empty, result.Message ?? "Error al crear el préstamo");
+                TempData["Error"] = result.Message ?? "Error al crear prestamo" + result.Message;
                 return View("Create", vm);
             }
 

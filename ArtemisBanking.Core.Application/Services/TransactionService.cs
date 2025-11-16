@@ -139,6 +139,7 @@ namespace ArtemisBanking.Core.Application.Services
             }
             catch (Exception ex)
             {
+
                return false;
             }
 
