@@ -1,0 +1,102 @@
+﻿@model HomeAdminViewModel
+@{
+    ViewData["Title"] = "Home Admin";
+    Layout = "_LayoutAdmin";
+}
+
+<h2 class="text-center">Panel de Administración</h2>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header bg-primary text-white">
+                Préstamos promedio por cliente
+            </div>
+            <div class="card-body">
+                <h4>Promedio: @Model.loanAverageClient?.AverageLoanAmount</h4>
+                <p>Total clientes: @Model.loanAverageClient?.TotalClients</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header bg-success text-white">
+                Total clientes (Web App)
+            </div>
+            <div class="card-body">
+                <h4>Activos: @Model.clientsViewModel?.TotalClientsActive</h4>
+                <p>Inactivos: @Model.clientsViewModel?.TotalClientsInactive</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header bg-info text-white">
+                Tarjetas de crédito activas
+            </div>
+            <div class="card-body">
+                <h4>@Model.creditCardCount?.TotalActiveCreditCard</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header bg-warning text-dark">
+                Productos financieros
+            </div>
+            <div class="card-body">
+                <h4>@Model.totalFinancial?.TotalFinancialProductsCount</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header bg-secondary text-white">
+                Cargas totales
+            </div>
+            <div class="card-body">
+                <h4>@Model.loadCount?.TotalLoad</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header bg-dark text-white">
+                Historial de pagos
+            </div>
+            <div class="card-body">
+                <h4>Total: @Model.paymentHistory?.TotalPaymentHistory</h4>
+                <p>Hoy: @Model.paymentHistory?.PaymentHistoryForDay</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header bg-primary text-white">
+                Cuentas de ahorro
+            </div>
+            <div class="card-body">
+                <h4>@Model.totalSaving?.TotalSavingAccount</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-header bg-danger text-white">
+                Transacciones históricas
+            </div>
+            <div class="card-body">
+                <h4>@Model.historicTransaction?.TotalHistoricTransactions</h4>
+            </div>
+        </div>
+    </div>
+</div>

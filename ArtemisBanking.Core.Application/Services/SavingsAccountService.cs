@@ -281,7 +281,6 @@ namespace ArtemisBanking.Core.Application.Services
                     return result;
                 }
 
-                // Validar que esté activa
                 if (!account.IsActive)
                 {
                     result.IsError = true;

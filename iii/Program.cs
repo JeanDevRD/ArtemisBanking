@@ -6,7 +6,6 @@ using ArtemisBanking.Core.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -29,7 +28,6 @@ var app = builder.Build();
 
 await app.Services.RunIdentitySeedAsync();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Shared/ErrorGeneral");
@@ -41,8 +39,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseSession(); //
-app.UseAuthentication(); // FALTABA ESTO
+app.UseSession(); 
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 
@@ -50,6 +48,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Auth}/{action=Login}/{id?}");
 
 app.Run();

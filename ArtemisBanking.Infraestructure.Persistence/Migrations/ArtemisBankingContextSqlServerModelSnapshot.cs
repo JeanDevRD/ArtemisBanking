@@ -109,6 +109,9 @@ namespace ArtemisBanking.Infraestructure.Persistence.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<DateTime>("CreateAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<decimal>("CreditLimit")
                         .HasColumnType("decimal(18,2)");
 
@@ -325,6 +328,11 @@ namespace ArtemisBanking.Infraestructure.Persistence.Migrations
                         .HasDefaultValue(0m);
 
                     b.Property<string>("Beneficiary")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("CashierId")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");

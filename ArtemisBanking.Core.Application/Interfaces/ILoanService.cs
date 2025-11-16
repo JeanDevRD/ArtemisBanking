@@ -15,5 +15,6 @@ namespace ArtemisBanking.Core.Application.Interfaces
         Task<ResultDto<List<LoanListDto>>> GetLoansByUserIdentity(string identificationNumber, bool isActive);
         Task<ResultDto<LoanDetailDto>> GetLoanDetailAsync(int loanId);
         Task<ResultDto<LoanDto>> UpdateInterestRateAsync(int loanId, decimal newAnnualInterestRate);
+        Task<ResultDto<List<LoanListDto>>> GetAllLoansAsync(bool? isActive = null);
     }
 }

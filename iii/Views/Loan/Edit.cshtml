@@ -1,0 +1,32 @@
+﻿@using ArtemisBanking.Core.Application.ViewModel.Loan
+@model UpdateInterestRateViewModel
+@{
+    ViewData["Title"] = "Editar Tasa de Interés";
+    Layout = "_LayoutAdmin";
+    var loanId = ViewBag.LoanId;
+}
+
+<div class="container mt-4 col-md-6">
+    <h3>Editar Tasa de Interés</h3>
+
+    <div class="alert alert-info">
+        <strong>Nota:</strong> Solo se recalcularán las cuotas futuras. Las cuotas ya vencidas o pagadas no serán modificadas.
+    </div>
+
+    <form asp-action="Edit" asp-route-loanId="@loanId" method="post" class="shadow-sm p-4 bg-light rounded">
+        <div class="form-group mb-3">
+            <label>Nueva Tasa de Interés Anual (%)</label>
+            <input asp-for="AnnualInterestRate" type="number" step="0.01" class="form-control" required />
+            <span asp-validation-for="AnnualInterestRate" class="text-danger"></span>
+        </div>
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">Actualizar Tasa</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

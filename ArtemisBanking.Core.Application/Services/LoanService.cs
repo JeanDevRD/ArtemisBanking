@@ -28,6 +28,7 @@ namespace ArtemisBanking.Core.Application.Services
 
         }
 
+       
         public async Task<List<LoanDto>> GetAllWithInclude()
         {
             try
@@ -70,6 +71,7 @@ namespace ArtemisBanking.Core.Application.Services
             try
             {
                 var client = await _clientApp.GetUserById(dto.UserId);
+
                 if (client == null || !client.IsActive)
                 {
                     result.IsError = true;
@@ -94,10 +96,8 @@ namespace ArtemisBanking.Core.Application.Services
                     return result;
                 }
 
-                var totalDebt = await _loanRepository.GetAllQueryAsync()
-                    .SelectMany(l => l.Installments!)
-                    .Where(i => !i.IsPaid)
-                    .SumAsync(i => i.PaymentAmount);
+                var totalDebt = await _loanRepository.GetAllQueryAsync().SelectMany(l => l.Installments!)
+                    .Where(i => !i.IsPaid).SumAsync(i => i.PaymentAmount);
 
                 var totalClients = await _clientApp.GetAllUser();
 
@@ -105,11 +105,8 @@ namespace ArtemisBanking.Core.Application.Services
 
                 var averageDebt = activeClientsCount > 0 ? totalDebt / activeClientsCount : 0;
 
-                var clientDebt = await _loanRepository.GetAllQueryAsync()
-                    .Where(l => l.UserId == client.Id)
-                    .SelectMany(l => l.Installments!)
-                    .Where(i => !i.IsPaid)
-                    .SumAsync(i => i.PaymentAmount);
+                var clientDebt = await _loanRepository.GetAllQueryAsync().Where(l => l.UserId == client.Id)
+                    .SelectMany(l => l.Installments!).Where(i => !i.IsPaid).SumAsync(i => i.PaymentAmount);
 
                 var monthlyRate = dto.AnnualInterestRate / 12 / 100;
                 var totalLoanWithInterest = dto.Amount * (1 + monthlyRate * dto.TermMonths);
@@ -122,6 +119,7 @@ namespace ArtemisBanking.Core.Application.Services
                 {
                     result.Message = "Asignar este préstamo convertirá al cliente en alto riesgo";
                 }
+
 
                 var loan = new LoanDto
                 {
@@ -259,23 +257,32 @@ namespace ArtemisBanking.Core.Application.Services
             return result;
         }
 
-        public async Task<ResultDto<List<LoanListDto>>?> GetAllActiveLoanAsync()
+        public async Task<ResultDto<List<LoanListDto>>> GetAllLoansAsync(bool? isActive = null)
         {
             var result = new ResultDto<List<LoanListDto>>();
             try
             {
-                var loanActive = await _loanRepository.GetAllQueryAsync().Where(x => x.IsActive).OrderByDescending(x => x.ApprovedAt).ToListAsync();
+                var query = _loanRepository.GetAllQueryAsync();
 
-                if (!loanActive.Any())
+                if (isActive.HasValue)
+                {
+                    query = query.Where(x => x.IsActive == isActive.Value);
+                }
+
+                var allLoans = await query
+                    .OrderByDescending(x => x.ApprovedAt)
+                    .ToListAsync();
+
+                if (!allLoans.Any())
                 {
                     result.IsError = true;
-                    result.Message = "No hay préstamos activos";
+                    result.Message = "No hay préstamos registrados";
                     return result;
                 }
 
                 var loans = new List<LoanListDto>();
 
-                foreach (var loan in loanActive)
+                foreach (var loan in allLoans)
                 {
                     var client = await _clientApp.GetUserById(loan.UserId);
 
@@ -296,7 +303,7 @@ namespace ArtemisBanking.Core.Application.Services
                         OutstandingAmount = loan.Installments?.Where(i => !i.IsPaid).Sum(i => i.PaymentAmount) ?? 0,
                         InterestRate = loan.AnnualInterestRate,
                         TermInMonths = loan.TermMonths,
-                        PaymentStatus = loan.Installments != null && loan.Installments.Any(i => i.IsLate)? "En mora" : "Al dia"
+                        PaymentStatus = loan.Installments != null && loan.Installments.Any(i => i.IsLate) ? "En mora" : "Al día"
                     });
                 }
 
@@ -310,6 +317,12 @@ namespace ArtemisBanking.Core.Application.Services
             }
 
             return result;
+        }
+
+
+        public async Task<ResultDto<List<LoanListDto>>?> GetAllActiveLoanAsync()
+        {
+           return await GetAllLoansAsync(true);
         }
 
         public async Task<ResultDto<List<LoanListDto>>> GetLoansByUserIdentity(string identificationNumber, bool isActive)

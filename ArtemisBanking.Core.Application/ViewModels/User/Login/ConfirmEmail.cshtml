@@ -1,0 +1,20 @@
+﻿@model string
+
+@{
+    ViewData["Title"] = "Confirmar correo";
+}
+
+
+<div class="col-12 col-md-6 offset-md-3 ">
+    <div class="card">
+        <div class="card-header bg-success text-light"><h5 class="text-center">Mensaje de confirmacion</h5></div>
+        <div class="card-body">
+
+                <div class="alert alert-primary  alert-dismissible fade show" role="alert">
+                    <h3 class="h3">@Model - <a class="btn btn-link" asp-controller="Login" asp-action="Index">Iniciar sesion</a></h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            
+        </div>
+    </div>
+</div>

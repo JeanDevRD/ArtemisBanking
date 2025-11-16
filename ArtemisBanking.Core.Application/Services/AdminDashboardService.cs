@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ArtemisBanking.Core.Application.Services
 {
-    public class AdminDashboardService
+    public class AdminDashboardService : IAdminDashboardService
     {
         private readonly ITransactionRepository _transactionRepo;
         private readonly IAccountServiceForApp _clientForApp;
@@ -35,21 +35,21 @@ namespace ArtemisBanking.Core.Application.Services
         }
 
 
-        public async Task<ResultDto<HistoricTransactionDto>> TotalTransactions() 
+        public async Task<ResultDto<HistoricTransactionDto>> TotalTransactions()
         {
             var result = new ResultDto<HistoricTransactionDto>();
-            try 
-            { 
+            try
+            {
                 var totalTransactions = await _transactionRepo.GetAllQueryAsync().CountAsync();
-                if(totalTransactions == 0)
+                if (totalTransactions == 0)
                 {
                     result.IsError = true;
                     result.Message = "Aun no hya historial de transacciones.";
                     return result;
                 }
 
-                result.Result = new HistoricTransactionDto 
-                { 
+                result.Result = new HistoricTransactionDto
+                {
                     TotalHistoricTransactions = totalTransactions
                 };
 
@@ -63,13 +63,13 @@ namespace ArtemisBanking.Core.Application.Services
             return result;
         }
 
-        public async Task<ResultDto<TotalClientsDto>> TotalClientsForWebApp() 
+        public async Task<ResultDto<TotalClientsDto>> TotalClientsForWebApp()
         {
             var result = new ResultDto<TotalClientsDto>();
             try
             {
                 var client = await _clientForApp.GetAllUser();
-                if(client == null) 
+                if (client == null)
                 {
                     result.IsError = true;
                     result.Message = "No hay clientes inactivos o activos";
@@ -78,7 +78,7 @@ namespace ArtemisBanking.Core.Application.Services
 
 
                 var active = client.Where(x => x.IsActive == true).Count();
-                if(active == 0) 
+                if (active == 0)
                 {
                     result.IsError = true;
                     result.Message = "No hay clientes activos";
@@ -94,15 +94,15 @@ namespace ArtemisBanking.Core.Application.Services
                 }
 
 
-                var clients = new TotalClientsDto 
+                var clients = new TotalClientsDto
                 {
-                    TotalClientsActive = active, 
+                    TotalClientsActive = active,
                     TotalClientsInactive = inactive
                 };
 
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 result.IsError = true;
                 result.Message = ex.Message;
@@ -159,20 +159,20 @@ namespace ArtemisBanking.Core.Application.Services
             return result;
         }
 
-        public async Task<ResultDto<LoadCountDto>> TotalLoads() 
+        public async Task<ResultDto<LoadCountDto>> TotalLoads()
         {
             var result = new ResultDto<LoadCountDto>();
             try
             {
                 var Loans = await _loanRepo.GetAllQueryAsync().Where(x => x.IsActive == true).CountAsync();
-                if (Loans == 0) 
+                if (Loans == 0)
                 {
                     result.IsError = true;
                     result.Message = "No hay prestamos activos en este momento";
                     return result;
                 }
 
-                var totalLoans = new LoadCountDto { TotalLoad = Loans};
+                var totalLoans = new LoadCountDto { TotalLoad = Loans };
                 result.IsError = false;
                 result.Result = totalLoans;
             }
@@ -191,16 +191,16 @@ namespace ArtemisBanking.Core.Application.Services
             try
             {
                 var creditCard = await _creditCardRepo.GetAllQueryAsync().Where(x => x.IsActive == true).CountAsync();
-                if (creditCard == 0) 
+                if (creditCard == 0)
                 {
                     result.IsError = true;
                     result.Message = "No hay emitidas que esten activas";
                     return result;
                 }
 
-                var totalCreditCard = new CreditCardCountDto 
-                { 
-                    TotalActiveCreditCard = creditCard 
+                var totalCreditCard = new CreditCardCountDto
+                {
+                    TotalActiveCreditCard = creditCard
                 };
 
                 result.IsError = false;
@@ -221,16 +221,16 @@ namespace ArtemisBanking.Core.Application.Services
             try
             {
                 var savingAccount = await _savingsAccountRepo.GetAllQueryAsync().Where(x => x.IsActive == true).CountAsync();
-                if (savingAccount == 0) 
+                if (savingAccount == 0)
                 {
                     result.IsError = true;
                     result.Message = "No hay cuentas de ahorro abiertas";
                     return result;
                 }
 
-                var totalSavingAccount = new TotalSavingAccountDto 
-                { 
-                    TotalSavingAccount = savingAccount 
+                var totalSavingAccount = new TotalSavingAccountDto
+                {
+                    TotalSavingAccount = savingAccount
                 };
 
                 result.IsError = false;
@@ -260,7 +260,7 @@ namespace ArtemisBanking.Core.Application.Services
                     return result;
                 }
                 var paymentHistoryForDay = await _transactionRepo.GetAllQueryAsync()
-                .Where(x => x.Date.Date == DateTime.UtcNow.Date &&  x.TypeTransaction == (int)TypeTransaction.LoanPaid && x.TypeTransaction == (int)TypeTransaction.CreditCardPaid).CountAsync();
+                .Where(x => x.Date.Date == DateTime.UtcNow.Date && x.TypeTransaction == (int)TypeTransaction.LoanPaid && x.TypeTransaction == (int)TypeTransaction.CreditCardPaid).CountAsync();
 
                 var paymentHistoryDto = new PaymentHistoryDto
                 {
@@ -278,10 +278,10 @@ namespace ArtemisBanking.Core.Application.Services
             return result;
         }
 
-        public async Task<ResultDto<TotalFinancialProductDto>> TotalFinancialProducts() 
-        { 
-         var result = new ResultDto<TotalFinancialProductDto>();
-            try 
+        public async Task<ResultDto<TotalFinancialProductDto>> TotalFinancialProducts()
+        {
+            var result = new ResultDto<TotalFinancialProductDto>();
+            try
             {
                 int savingsAccounts = await _savingsAccountRepo.GetAllQueryAsync().CountAsync();
                 int creditCards = await _creditCardRepo.GetAllQueryAsync().CountAsync();
@@ -289,7 +289,7 @@ namespace ArtemisBanking.Core.Application.Services
 
                 int totalProductsCount = savingsAccounts + creditCards + Loans;
 
-                if(totalProductsCount == 0) 
+                if (totalProductsCount == 0)
                 {
                     result.IsError = true;
                     result.Message = "Aun no hay productos financieros asignados a clientes";
@@ -299,12 +299,12 @@ namespace ArtemisBanking.Core.Application.Services
                 {
                     TotalFinancialProductsCount = totalProductsCount,
                 };
-             
+
                 result.IsError = false;
                 result.Result = totalProducts;
-            } 
-            catch(Exception ex) 
-            { 
+            }
+            catch (Exception ex)
+            {
                 result.IsError = true;
                 result.Message = ex.Message;
 
@@ -317,8 +317,9 @@ namespace ArtemisBanking.Core.Application.Services
             var result = new ResultDto<LoanAverageClientDto>();
             try
             {
-                var clients = await _clientForApi.GetAllUser(isActive: true);
-                int totalClients = clients.Count;
+                var clients = await _clientForApi.GetAllUser();
+                var active = clients.Where(x => x.IsActive == true).ToList();
+                int totalClients = active.Count;
 
                 if (totalClients == 0)
                 {
@@ -340,7 +341,7 @@ namespace ArtemisBanking.Core.Application.Services
                     }
                 }
 
-               
+
                 var activeCreditCards = await _creditCardRepo.GetAllListAsync();
 
                 totalDebt += activeCreditCards.Where(c => c.IsActive).Sum(c => c.CurrentDebt);

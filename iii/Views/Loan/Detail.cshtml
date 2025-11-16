@@ -1,0 +1,78 @@
+﻿@using ArtemisBanking.Core.Application.ViewModel.Loan
+@model LoanDetailViewModel
+@{
+    ViewData["Title"] = "Detalle del Préstamo";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">Detalle del Préstamo #@Model.LoanNumber</h3>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5>Información General</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Cliente:</strong> @Model.ClientFullName</p>
+                    <p><strong>Monto Aprobado:</strong> @Model.Amount.ToString("C2")</p>
+                    <p><strong>Tasa de Interés:</strong> @Model.AnnualInterestRate%</p>
+                    <p><strong>Plazo:</strong> @Model.TermMonths meses</p>
+                    <p><strong>Fecha de Aprobación:</strong> @Model.ApprovedAt.ToString("dd/MM/yyyy")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Tabla de Amortización</h4>
+    <div class="table-responsive">
+        <table class="table table-striped shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha de Pago</th>
+                    <th>Valor de Cuota</th>
+                    <th>Estado de Pago</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Installments != null && Model.Installments.Any())
+                {
+                    @foreach (var installment in Model.Installments)
+                    {
+                        <tr class="@(installment.IsLate ? "table-danger" : installment.IsPaid ? "table-success" : "")">
+                            <td>@installment.PaymentDate.ToString("dd/MM/yyyy")</td>
+                            <td>@installment.PaymentAmount.ToString("C2")</td>
+                            <td>
+                                <span class="badge bg-@(installment.IsPaid ? "success" : "warning")">
+                                    @(installment.IsPaid ? "Pagada" : "Pendiente")
+                                </span>
+                            </td>
+                            <td>
+                                @if (installment.IsLate)
+                                {
+                                    <span class="badge bg-danger">Atrasada</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Al día</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No hay cuotas registradas</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">Volver al Listado</a>
+    </div>
+</div>
