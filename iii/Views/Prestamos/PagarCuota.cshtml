@@ -1,0 +1,42 @@
+@model ArtemisBanking.Core.Application.Dtos.Loan.LoanDto
+@{
+    ViewData["Title"] = "Pagar Cuota de Préstamo";
+}
+
+<div class="container mt-4 col-md-6">
+    <h3>Pago de Cuota - Préstamo @Model.LoanNumber</h3>
+
+    <div class="alert alert-info">
+        <strong>Monto de Cuota:</strong> @ViewBag.MontoCuota?.ToString("C2") <br />
+        <strong>Fecha de Vencimiento:</strong> @ViewBag.FechaVencimiento?.ToString("dd/MM/yyyy")
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post" class="bg-light p-4 rounded">
+                <input type="hidden" name="prestamoId" value="@ViewBag.PrestamoId" />
+
+                <div class="form-group mb-3">
+                    <label>Monto a Pagar</label>
+                    <input type="number" name="monto" class="form-control" step="0.01" value="@ViewBag.MontoCuota" required />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Cuenta a Debitar</label>
+                    <select name="cuentaOrigenId" class="form-control" required>
+                        <option value="">-- Seleccione cuenta --</option>
+                        <!-- Las cuentas deberían venir desde el controlador -->
+                    </select>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Referencia</label>
+                    <input type="text" name="referencia" class="form-control" placeholder="Número de referencia (opcional)" />
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Continuar</button>
+                <a asp-controller="Prestamos" asp-action="Detalle" asp-route-id="@Model.Id" class="btn btn-outline-secondary w-100 mt-2">Cancelar</a>
+            </form>
+        </div>
+    </div>
+</div>
