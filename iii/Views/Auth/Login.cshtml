@@ -1,27 +1,39 @@
 ﻿@{
+    Layout = "_LayoutAnonymous";
     ViewData["Title"] = "Iniciar Sesión";
 }
-<div class="container mt-5 col-md-4">
-    <h3 class="text-center">Inicio de Sesión</h3>
-    <form asp-action="Login" method="post" class="border p-4 shadow-sm rounded bg-light">
-        <div class="form-group mb-3">
-            <label>Usuario</label>
-            <input type="text" name="username" class="form-control" required />
-        </div>
-        <div class="form-group mb-3">
-            <label>Contraseña</label>
-            <input type="password" name="password" class="form-control" required />
-        </div>
-        <button type="submit" class="btn btn-primary w-100">Entrar</button>
-        @if (ViewBag.Error != null)
-        {
-            <p class="text-danger mt-2 text-center">@ViewBag.Error</p>
-        }
-    </form>
 
-    @if (TempData["Error"] != null)
-    {
-        <div class="alert alert-warning text-center mt-3">@TempData["Error"]</div>
-    }
+<div class="card shadow-sm">
+    <div class="card-header bg-primary text-white text-center py-3">
+        <h3 class="mb-0">
+            <i class="bi bi-shield-lock"></i> Artemis Banking
+        </h3>
+        <small>Banca en línea segura</small>
+    </div>
+    <div class="card-body p-4">
+        <form asp-action="Login" method="post">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Usuario</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" name="username" class="form-control" placeholder="Ingrese su usuario" required autofocus />
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-bold">Contraseña</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" name="password" class="form-control" placeholder="Ingrese su contraseña" required />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 py-2 mb-3">
+                <i class="bi bi-box-arrow-in-right"></i> Iniciar Sesión
+            </button>
+            <div class="text-center">
+                <a asp-controller="Auth" asp-action="ForgotPassword" class="text-decoration-none">
+                    <i class="bi bi-question-circle"></i> ¿Olvidaste tu contraseña?
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
-

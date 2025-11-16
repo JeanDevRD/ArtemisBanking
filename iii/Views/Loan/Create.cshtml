@@ -1,0 +1,79 @@
+﻿@using ArtemisBanking.Core.Application.ViewM.Loan
+@model CreateLoanRequestViewModel
+@{
+    ViewData["Title"] = "Asignar Préstamo";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4 col-md-6">
+    <h3>Configurar Préstamo</h3>
+
+    @if (!string.IsNullOrEmpty(ViewBag.HighRiskWarning))
+    {
+        <div class="alert alert-warning">
+            <h5 class="alert-heading">Advertencia de Alto Riesgo</h5>
+            <p>@ViewBag.HighRiskWarning</p>
+            <hr>
+            <p class="mb-0">¿Está seguro que desea continuar con la asignación?</p>
+        </div>
+
+        <form asp-action="Create" method="post" class="shadow-sm p-4 bg-light rounded">
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="ApprovedByUserId" />
+            <input type="hidden" asp-for="Amount" />
+            <input type="hidden" asp-for="TermMonths" />
+            <input type="hidden" asp-for="AnnualInterestRate" />
+            <input type="hidden" name="confirmRisk" value="true" />
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-danger">Confirmar y Asignar de Todos Modos</button>
+                <a asp-action="SelectClient" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    }
+    else
+    {
+        <form asp-action="Create" method="post" class="shadow-sm p-4 bg-light rounded">
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="ApprovedByUserId" />
+
+            <div class="form-group mb-3">
+                <label>Plazo (meses)</label>
+                <select asp-for="TermMonths" class="form-control" required>
+                    <option value="6">6 meses</option>
+                    <option value="12">12 meses</option>
+                    <option value="18">18 meses</option>
+                    <option value="24">24 meses</option>
+                    <option value="30">30 meses</option>
+                    <option value="36">36 meses</option>
+                    <option value="42">42 meses</option>
+                    <option value="48">48 meses</option>
+                    <option value="54">54 meses</option>
+                    <option value="60">60 meses</option>
+                </select>
+                <span asp-validation-for="TermMonths" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label>Monto a Prestar</label>
+                <input asp-for="Amount" type="number" step="0.01" class="form-control" required />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label>Tasa de Interés Anual (%)</label>
+                <input asp-for="AnnualInterestRate" type="number" step="0.01" class="form-control" required />
+                <span asp-validation-for="AnnualInterestRate" class="text-danger"></span>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-success">Asignar Préstamo</button>
+                <a asp-action="SelectClient" class="btn btn-outline-secondary">Volver a Selección</a>
+            </div>
+        </form>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

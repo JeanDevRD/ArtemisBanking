@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Usuarios";
+    Layout = "_LayoutAdmin";
 }
 
 <h2 class="text-center">Gestión de usuarios</h2>
@@ -85,7 +86,6 @@ else
         </tbody>
     </table>
 
-    <!-- Paginación -->
     <nav aria-label="Page navigation">
         <ul class="pagination">
             @if (Model.PageNumber > 1)

@@ -1,9 +1,12 @@
-﻿using ArtemisBanking.Core.Application.Dtos.Loan;
+﻿using ArtemisBanking.Core.Application.Dtos.Common;
+using ArtemisBanking.Core.Application.Dtos.Loan;
 using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Application.ViewM.Loan;
 using ArtemisBanking.Core.Application.ViewModel.Loan;
+using ArtemisBanking.Core.Application.ViewModels.Loan;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using X.PagedList;
 
 namespace ArtemisBankingWebApp.Controllers
 {
@@ -18,19 +21,46 @@ namespace ArtemisBankingWebApp.Controllers
             _mapper = mapper;
         }
 
-        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 20, bool? isActive = null)
+        public async Task<IActionResult> Index(int? page, string? cedula = null, bool? isActive = null)
         {
-            var loansResult = await _loanService.GetAllLoansAsync(isActive);
+            var pageNumber = page ?? 1;
+            var pageSize = 20;
 
-            var data = new HomeLoanViewModel
+            ResultDto<List<LoanListDto>> loansResult;
+
+            if (!string.IsNullOrEmpty(cedula))
             {
-                Loans = _mapper.Map<List<LoanListViewModel>>(loansResult.Result),
-                PageNumber = pageNumber,
-                TotalPages = (int)Math.Ceiling((double)loansResult.Result!.Count / pageSize)
-            };
+                loansResult = await _loanService.GetLoansByUserIdentity(cedula, isActive ?? true);
+            }
+            else
+            {
+                loansResult = await _loanService.GetAllLoansAsync(isActive);
+            }
 
-            return View("Index", data);
+            if (loansResult.IsError || loansResult.Result == null || loansResult.Result.Count == 0)
+            {
+                TempData["Error"] = loansResult.Message ?? "No se encontraron préstamos";
+                return View("Index", new StaticPagedList<LoanListViewModel>(new List<LoanListViewModel>(),
+                    pageNumber,
+                    pageSize,
+                    0));
+            }
+
+            var allLoans = _mapper.Map<List<LoanListViewModel>>(loansResult.Result);
+            var totalCount = allLoans.Count;
+            var pagedLoans = allLoans.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+            var pagedList = new StaticPagedList<LoanListViewModel>(pagedLoans, pageNumber, pageSize, totalCount);
+
+            ViewBag.FilterCedula = cedula;
+            ViewBag.IsActive = isActive;
+
+            return View("Index", pagedList);
         }
+
+
+
+
 
         public IActionResult Create(string userId)
         {
@@ -64,6 +94,20 @@ namespace ArtemisBankingWebApp.Controllers
 
             TempData["Success"] = $"Préstamo #{result.Result!.LoanNumber} creado exitosamente.";
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> SelectClient()
+        {
+            var result = await _loanService.GetElegibleUserForLoan();
+
+            if (result.IsError || result.Result == null)
+            {
+                TempData["Error"] = result.Message ?? "No hay clientes elegibles";
+                return RedirectToAction("Index");
+            }
+
+            var clients = _mapper.Map<List<ElegibleUserForLoanViewModel>>(result.Result);
+            return View("SelectClient", clients);
         }
 
         public async Task<IActionResult> Detail(int loanId)

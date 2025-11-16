@@ -29,6 +29,16 @@ namespace ArtemisBankingWebApp.Controllers
                 ActiveUsers = await _userService.FilterClientForRole(role, pageNumber, pageSize);
             }
 
+            if(ActiveUsers == null || ActiveUsers.Result == null || ActiveUsers.Result.Count == 0)
+            {
+                return View("Index", new HomeUser
+                {
+                    Users = new List<UserViewModel>(),
+                    PageNumber = 0,
+                    TotalPages = 0
+                });
+            }
+
             var data = new HomeUser
             {
                 Users = _mapper.Map<List<UserViewModel>>(ActiveUsers.Result),

@@ -71,6 +71,7 @@ namespace ArtemisBanking.Core.Application.Services
             try
             {
                 var client = await _clientApp.GetUserById(dto.UserId);
+
                 if (client == null || !client.IsActive)
                 {
                     result.IsError = true;
@@ -95,10 +96,8 @@ namespace ArtemisBanking.Core.Application.Services
                     return result;
                 }
 
-                var totalDebt = await _loanRepository.GetAllQueryAsync()
-                    .SelectMany(l => l.Installments!)
-                    .Where(i => !i.IsPaid)
-                    .SumAsync(i => i.PaymentAmount);
+                var totalDebt = await _loanRepository.GetAllQueryAsync().SelectMany(l => l.Installments!)
+                    .Where(i => !i.IsPaid).SumAsync(i => i.PaymentAmount);
 
                 var totalClients = await _clientApp.GetAllUser();
 
@@ -106,11 +105,8 @@ namespace ArtemisBanking.Core.Application.Services
 
                 var averageDebt = activeClientsCount > 0 ? totalDebt / activeClientsCount : 0;
 
-                var clientDebt = await _loanRepository.GetAllQueryAsync()
-                    .Where(l => l.UserId == client.Id)
-                    .SelectMany(l => l.Installments!)
-                    .Where(i => !i.IsPaid)
-                    .SumAsync(i => i.PaymentAmount);
+                var clientDebt = await _loanRepository.GetAllQueryAsync().Where(l => l.UserId == client.Id)
+                    .SelectMany(l => l.Installments!).Where(i => !i.IsPaid).SumAsync(i => i.PaymentAmount);
 
                 var monthlyRate = dto.AnnualInterestRate / 12 / 100;
                 var totalLoanWithInterest = dto.Amount * (1 + monthlyRate * dto.TermMonths);
@@ -123,6 +119,7 @@ namespace ArtemisBanking.Core.Application.Services
                 {
                     result.Message = "Asignar este préstamo convertirá al cliente en alto riesgo";
                 }
+
 
                 var loan = new LoanDto
                 {

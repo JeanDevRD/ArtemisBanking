@@ -1,14 +1,9 @@
-﻿using ArtemisBanking.Core.Application.Dtos.AdminDashboard;
-using ArtemisBanking.Core.Application.Interfaces;
+﻿using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Application.ViewModels.AdminDashboard;
 using ArtemisBanking.Core.Application.ViewModels.HomeAdmin;
-using ArtemisBankingWebApp.Models;
 using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
-using X.PagedList;
-using X.PagedList.Mvc.Core;
+
 
 namespace ArtemisBankingWebApp.Controllers
 {

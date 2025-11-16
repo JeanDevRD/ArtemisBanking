@@ -18,7 +18,21 @@ namespace ArtemisBankingWebApp.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult Login() => View();
+        public IActionResult Login()
+        {
+            if (_signInManager.IsSignedIn(User))
+            {
+                if (User.IsInRole("Admin"))
+                    return RedirectToAction("Index", "HomeAdmin");
+                if (User.IsInRole("Cliente"))
+                    return RedirectToAction("Index", "Home");
+                if (User.IsInRole("Teller"))
+                    return RedirectToAction("Index", "Cajero");
+                if (User.IsInRole("Merchant"))
+                    return RedirectToAction("Index", "Merchant");
+            }
+            return View();
+        }
 
         [HttpPost]
         [AllowAnonymous]
@@ -41,9 +55,8 @@ namespace ArtemisBankingWebApp.Controllers
 
             var roles = await _userManager.GetRolesAsync(user);
 
-            // Redirección según el rol
             if (roles.Contains("Admin"))
-                return RedirectToAction("Index", "AdminDashboard");
+                return RedirectToAction("Index", "HomeAdmin");
 
             if (roles.Contains("Cliente"))
                 return RedirectToAction("Index", "Home");
