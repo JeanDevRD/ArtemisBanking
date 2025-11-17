@@ -15,10 +15,11 @@ namespace ArtemisBankingWebApp.Controllers
         {
             _casherService = casherService;
             _mapper = mapper;
-        }
+        } 
 
         public async Task<IActionResult> Index()
         {
+
             var cashierId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var totalTransactions = await _casherService.CountTransactionsByCasherLog(cashierId);
