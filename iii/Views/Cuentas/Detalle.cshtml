@@ -31,19 +31,19 @@
             <div class="mt-4">
                 <h5>Operaciones Disponibles</h5>
                 <div class="btn-group" role="group">
-                    <a asp-controller="Cuentas" asp-action="Transferir" asp-route-id="@Model.Id" class="btn btn-primary">Transferir</a>
-                    <a asp-controller="Cuentas" asp-action="Depositar" asp-route-id="@Model.Id" class="btn btn-success">Depositar</a>
-                    <a asp-controller="Cuentas" asp-action="Retirar" asp-route-id="@Model.Id" class="btn btn-warning">Retirar</a>
+                    <a asp-controller="Accounts" asp-action="Transfer" asp-route-id="@Model.Id" class="btn btn-primary">Transferir</a>
+                    <a asp-controller="Accounts" asp-action="Deposit" asp-route-id="@Model.Id" class="btn btn-success">Depositar</a>
+                    <a asp-controller="Accounts" asp-action="Withdraw" asp-route-id="@Model.Id" class="btn btn-warning">Retirar</a>
                 </div>
             </div>
         </div>
 
         <div class="col-md-4">
             <h5>Últimas Transacciones</h5>
-            @if (ViewBag.Transacciones != null && ViewBag.Transacciones.Any())
+            @if (ViewBag.Transactions != null && ViewBag.Transactions.Any())
             {
                 <div class="list-group">
-                    @foreach (var t in ViewBag.Transacciones)
+                    @foreach (var t in ViewBag.Transactions)
                     {
                         <a href="#" class="list-group-item list-group-item-action">
                             <div class="d-flex w-100 justify-content-between">

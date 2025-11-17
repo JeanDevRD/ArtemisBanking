@@ -1,4 +1,4 @@
-﻿@model IPagedList<ArtemisBankingWebApp.Models.ProductoViewModel>
+﻿@model IPagedList<ArtemisBankingWebApp.Models.ProductViewModel>
 @{
     ViewData["Title"] = "Mis Productos";
 }
@@ -10,7 +10,7 @@
             <div class="card shadow-sm bg-success text-white">
                 <div class="card-body">
                     <h5>Saldo Total</h5>
-                    <h3>@ViewBag.SaldoTotal</h3>
+                    <h3>@ViewBag.TotalBalance</h3>
                 </div>
             </div>
         </div>
@@ -18,7 +18,7 @@
             <div class="card shadow-sm bg-danger text-white">
                 <div class="card-body">
                     <h5>Deuda Total</h5>
-                    <h3>@ViewBag.DeudaTotal</h3>
+                    <h3>@ViewBag.TotalDebt</h3>
                 </div>
             </div>
         </div>
@@ -26,7 +26,7 @@
             <div class="card shadow-sm bg-warning text-dark">
                 <div class="card-body">
                     <h5>Próximo Pago</h5>
-                    <h3>@ViewBag.ProximoPago</h3>
+                    <h3>@ViewBag.NextPayment</h3>
                 </div>
             </div>
         </div>
@@ -46,15 +46,15 @@
             @foreach (var p in Model)
             {
                 <tr>
-                    <td>@p.Tipo</td>
-                    <td>@p.Numero</td>
-                    <td>@p.Monto.ToString("C2")</td>
-                    <td><span class="badge bg-@(p.Estado == "Activa" || p.Estado == "Activo" ? "success" : "secondary")">@p.Estado</span></td>
+                    <td>@p.Type</td>
+                    <td>@p.Number</td>
+                    <td>@p.Amount.ToString("C2")</td>
+                    <td><span class="badge bg-@(p.Status == "Active" || p.Status == "Active" ? "success" : "secondary")">@p.Status</span></td>
                     <td>
-                        <a asp-controller="@(p.TipoId == 1 ? "Cuentas" : p.TipoId == 2 ? "Prestamos" : "Tarjetas")"
-                           asp-action="Detalle" asp-route-id="@p.Id" class="btn btn-sm btn-info">Ver</a>
-                        <a asp-controller="@(p.TipoId == 1 ? "Transferencias" : "Pagos")"
-                           asp-action="@(p.TipoId == 1 ? "Index" : p.TipoId == 2 ? "PagarCuota" : "PagarTarjeta")"
+                        <a asp-controller="@(p.TypeId == 1 ? "Accounts" : p.TypeId == 2 ? "Loans" : "Cards")"
+                           asp-action="Detail" asp-route-id="@p.Id" class="btn btn-sm btn-info">Ver</a>
+                        <a asp-controller="@(p.TypeId == 1 ? "Transfers" : "Payments")"
+                           asp-action="@(p.TypeId == 1 ? "Index" : p.TypeId == 2 ? "PayInstallment" : "PayCard")"
                            asp-route-id="@p.Id" class="btn btn-sm btn-primary">Operar</a>
                     </td>
                 </tr>

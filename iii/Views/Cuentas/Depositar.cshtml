@@ -4,21 +4,21 @@
 }
 
 <div class="container mt-4 col-md-6">
-    <h3>Depósito a Cuenta @ViewBag.CuentaNumero</h3>
+    <h3>Depósito a Cuenta @ViewBag.AccountNumber</h3>
 
     <div class="card shadow-sm">
         <div class="card-body">
             <form method="post" class="bg-light p-4 rounded">
-                <input type="hidden" name="cuentaId" value="@ViewBag.CuentaId" />
+                <input type="hidden" name="accountId" value="@ViewBag.AccountId" />
 
                 <div class="form-group mb-3">
                     <label>Monto a Depositar</label>
-                    <input type="number" name="monto" class="form-control" step="0.01" min="0.01" required placeholder="0.00" />
+                    <input type="number" name="amount" class="form-control" step="0.01" min="0.01" required placeholder="0.00" />
                 </div>
 
                 <div class="form-group mb-3">
                     <label>Método de Depósito</label>
-                    <select name="metodo" class="form-control" required>
+                    <select name="method" class="form-control" required>
                         <option value="">-- Seleccione un método --</option>
                         <option value="Efectivo">Efectivo en Sucursal</option>
                         <option value="Transferencia">Transferencia Bancaria</option>
@@ -28,11 +28,11 @@
 
                 <div class="form-group mb-3">
                     <label>Concepto</label>
-                    <textarea name="concepto" class="form-control" rows="3" placeholder="Descripción del depósito"></textarea>
+                    <textarea name="concept" class="form-control" rows="3" placeholder="Descripción del depósito"></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-success w-100">Continuar</button>
-                <a asp-controller="Cuentas" asp-action="Detalle" asp-route-id="@ViewBag.CuentaId" class="btn btn-outline-secondary w-100 mt-2">Cancelar</a>
+                <a asp-controller="Accounts" asp-action="Detail" asp-route-id="@ViewBag.AccountId" class="btn btn-outline-secondary w-100 mt-2">Cancelar</a>
             </form>
         </div>
     </div>

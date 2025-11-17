@@ -1,14 +1,13 @@
-﻿
-namespace ArtemisBankingWebApp.Models
+﻿namespace ArtemisBankingWebApp.Models
 {
-    public class ProductoViewModel
+    public class ProductViewModel
     {
-        public string Tipo { get; set; } = "";
-        public string Numero { get; set; } = "";
-        public decimal Monto { get; set; }
-        public string Estado { get; set; } = "";
-        public DateTime Fecha { get; set; }
+        public string Type { get; set; } = "";
+        public string Number { get; set; } = "";
+        public decimal Amount { get; set; }
+        public string Status { get; set; } = "";
+        public DateTime Date { get; set; }
         public int Id { get; set; }
-        public int TipoId { get; set; } // 1=Cuenta, 2=Préstamo, 3=Tarjeta
+        public int TypeId { get; set; } // 1=Account, 2=Loan, 3=Card
     }
 }

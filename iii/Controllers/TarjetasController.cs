@@ -6,12 +6,12 @@ using System.Security.Claims;
 namespace ArtemisBankingWebApp.Controllers
 {
     [Authorize(Roles = "cliente")]
-    public class TarjetasController : Controller
+    public class CardsController : Controller
     {
         private readonly ICreditCardService _creditCardService;
         private readonly ITransactionService _transactionService;
 
-        public TarjetasController(
+        public CardsController(
             ICreditCardService creditCardService,
             ITransactionService transactionService)
         {
@@ -20,46 +20,46 @@ namespace ArtemisBankingWebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Detalle(int id)
+        public async Task<IActionResult> Detail(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var tarjeta = await _creditCardService.GetByIdAsync(id);
+            var card = await _creditCardService.GetByIdAsync(id);
 
             // Verificar que la tarjeta pertenece al usuario autenticado
-            if (tarjeta == null || tarjeta.UserId != userId)
+            if (card == null || card.UserId != userId)
                 return RedirectToAction("Index", "Home");
 
-            return View(tarjeta);
+            return View(card);
         }
 
         [HttpGet]
-        public async Task<IActionResult> PagarTarjeta(int id)
+        public async Task<IActionResult> PayCard(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var tarjeta = await _creditCardService.GetByIdAsync(id);
+            var card = await _creditCardService.GetByIdAsync(id);
 
             // Verificar pertenencia
-            if (tarjeta == null || tarjeta.UserId != userId)
+            if (card == null || card.UserId != userId)
                 return RedirectToAction("Index", "Home");
 
-            ViewBag.TarjetaId = id;
-            ViewBag.DeudaActual = tarjeta.CurrentDebt;
+            ViewBag.CardId = id;
+            ViewBag.CurrentDebt = card.CurrentDebt;
 
-            return View(tarjeta);
+            return View(card);
         }
 
         [HttpGet]
-        public async Task<IActionResult> AvanceCash(int id)
+        public async Task<IActionResult> CashAdvance(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var tarjeta = await _creditCardService.GetByIdAsync(id);
+            var card = await _creditCardService.GetByIdAsync(id);
 
             // Verificar pertenencia
-            if (tarjeta == null || tarjeta.UserId != userId)
+            if (card == null || card.UserId != userId)
                 return RedirectToAction("Index", "Home");
 
             // Esta acción redirige al controlador de Avances
-            return RedirectToAction("Index", "Avances", new { tarjetaId = id });
+            return RedirectToAction("Index", "CashAdvances", new { cardId = id });
         }
     }
 }

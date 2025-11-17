@@ -37,56 +37,56 @@ namespace ArtemisBankingWebApp.Controllers
             var pageNumber = page ?? 1;
             var pageSize = 20;
 
-            var cuentas = await _savingsAccountService.GetAllAsync();
-            var prestamos = await _loanService.GetAllAsync();
-            var tarjetas = await _creditCardService.GetAllAsync();
+            var accounts = await _savingsAccountService.GetAllAsync();
+            var loans = await _loanService.GetAllAsync();
+            var cards = await _creditCardService.GetAllAsync();
 
-            var misCuentas = cuentas.Where(c => c.UserId == userId).ToList();
-            var misPrestamos = prestamos.Where(p => p.UserId == userId).ToList();
-            var misTarjetas = tarjetas.Where(t => t.UserId == userId).ToList();
+            var myAccounts = accounts.Where(c => c.UserId == userId).ToList();
+            var myLoans = loans.Where(p => p.UserId == userId).ToList();
+            var myCards = cards.Where(t => t.UserId == userId).ToList();
 
             // ORDEN: más reciente → antiguo
-            var productos = misCuentas.Select(c => new ProductoViewModel
+            var products = myAccounts.Select(c => new ProductViewModel
             {
-                Tipo = "Cuenta de Ahorro",
-                Numero = c.AccountNumber,
-                Monto = c.Balance,
-                Estado = c.IsActive ? "Activa" : "Inactiva",
-                Fecha = c.CreatedAt,
+                Type = "Savings Account",
+                Number = c.AccountNumber,
+                Amount = c.Balance,
+                Status = c.IsActive ? "Active" : "Inactive",
+                Date = c.CreatedAt,
                 Id = c.Id,
-                TipoId = 1
+                TypeId = 1
             })
-            .Concat(misPrestamos.Select(p => new ProductoViewModel
+            .Concat(myLoans.Select(p => new ProductViewModel
             {
-                Tipo = "Préstamo",
-                Numero = p.LoanNumber,
-                Monto = p.Amount,
-                Estado = p.IsActive ? "Activo" : "Cerrado",
-                Fecha = p.ApprovedAt,
+                Type = "Loan",
+                Number = p.LoanNumber,
+                Amount = p.Amount,
+                Status = p.IsActive ? "Active" : "Closed",
+                Date = p.ApprovedAt,
                 Id = p.Id,
-                TipoId = 2
+                TypeId = 2
             }))
-            .Concat(misTarjetas.Select(t => new ProductoViewModel
+            .Concat(myCards.Select(t => new ProductViewModel
             {
-                Tipo = "Tarjeta de Crédito",
-                Numero = t.CardNumber,
-                Monto = t.CurrentDebt,
-                Estado = t.IsActive ? "Activa" : "Inactiva",
-                Fecha = t.CreateAt,
+                Type = "Credit Card",
+                Number = t.CardNumber,
+                Amount = t.CurrentDebt,
+                Status = t.IsActive ? "Active" : "Inactive",
+                Date = t.CreateAt,
                 Id = t.Id,
-                TipoId = 3
+                TypeId = 3
             }))
-            .OrderByDescending(p => p.Fecha)
+            .OrderByDescending(p => p.Date)
             .ToList();
 
-            var totalCount = productos.Count;
-            var subset = productos.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-            var productosPaged = new StaticPagedList<ProductoViewModel>(subset, pageNumber, pageSize, totalCount);
+            var totalCount = products.Count;
+            var subset = products.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+            var productsPaged = new StaticPagedList<ProductViewModel>(subset, pageNumber, pageSize, totalCount);
 
             // Cálculos
-            decimal saldoTotal = misCuentas.Sum(c => c.Balance);
-            decimal deudaTotal = misTarjetas.Sum(t => t.CurrentDebt) + misPrestamos.Sum(p => p.Amount);
-            decimal proximoPago = misPrestamos
+            decimal totalBalance = myAccounts.Sum(c => c.Balance);
+            decimal totalDebt = myCards.Sum(t => t.CurrentDebt) + myLoans.Sum(p => p.Amount);
+            decimal nextPayment = myLoans
                 .Where(p => p.Installments != null && p.Installments.Any(i => !i.IsPaid))
                 .SelectMany(p => p.Installments!)
                 .Where(i => !i.IsPaid)
@@ -95,7 +95,7 @@ namespace ArtemisBankingWebApp.Controllers
                 .FirstOrDefault();
 
             // Próximas cuotas de préstamos
-            decimal proximasCuotas = misPrestamos
+            decimal nextInstallments = myLoans
                 .Where(p => p.Installments != null && p.Installments.Any(i => !i.IsPaid))
                 .SelectMany(p => p.Installments!)
                 .Where(i => !i.IsPaid)
@@ -104,23 +104,23 @@ namespace ArtemisBankingWebApp.Controllers
                 .FirstOrDefault();
 
             // Pago mínimo de tarjetas (generalmente 5% de la deuda)
-            decimal proximoPagoMinimo = misTarjetas
+            decimal minimumPayment = myCards
                 .Where(t => t.CurrentDebt > 0)
                 .Sum(t => t.CurrentDebt * 0.05m);
 
-            ViewBag.SaldoTotal = saldoTotal.ToString("C2");
-            ViewBag.DeudaTotal = deudaTotal.ToString("C2");
-            ViewBag.ProximoPago = proximoPago.ToString("C2");
-            ViewBag.ProximoPagoMinimo = proximoPagoMinimo.ToString("C2");
-            ViewBag.ProximasCuotas = proximasCuotas.ToString("C2");
+            ViewBag.TotalBalance = totalBalance.ToString("C2");
+            ViewBag.TotalDebt = totalDebt.ToString("C2");
+            ViewBag.NextPayment = nextPayment.ToString("C2");
+            ViewBag.MinimumPayment = minimumPayment.ToString("C2");
+            ViewBag.NextInstallments = nextInstallments.ToString("C2");
 
-            return View(productosPaged);
+            return View(productsPaged);
         }
 
         [AllowAnonymous]
-        public IActionResult AccesoDenegado()
+        public IActionResult AccessDenied()
         {
-            return RedirectToAction("AccesoDenegado", "Auth");
+            return RedirectToAction("AccessDenied", "Auth");
         }
     }
 }

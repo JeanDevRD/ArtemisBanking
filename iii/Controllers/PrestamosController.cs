@@ -6,12 +6,12 @@ using System.Security.Claims;
 namespace ArtemisBankingWebApp.Controllers
 {
     [Authorize(Roles = "cliente")]
-    public class PrestamosController : Controller
+    public class LoansController : Controller
     {
         private readonly ILoanService _loanService;
         private readonly ITransactionService _transactionService;
 
-        public PrestamosController(
+        public LoansController(
             ILoanService loanService,
             ITransactionService transactionService)
         {
@@ -20,43 +20,43 @@ namespace ArtemisBankingWebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Detalle(int id)
+        public async Task<IActionResult> Detail(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var prestamo = await _loanService.GetByIdAsync(id);
+            var loan = await _loanService.GetByIdAsync(id);
 
             // Verificar que el préstamo pertenece al usuario autenticado
-            if (prestamo == null || prestamo.UserId != userId)
+            if (loan == null || loan.UserId != userId)
                 return RedirectToAction("Index", "Home");
 
-            return View(prestamo);
+            return View(loan);
         }
 
         [HttpGet]
-        public async Task<IActionResult> PagarCuota(int id)
+        public async Task<IActionResult> PayInstallment(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var prestamo = await _loanService.GetByIdAsync(id);
+            var loan = await _loanService.GetByIdAsync(id);
 
             // Verificar pertenencia
-            if (prestamo == null || prestamo.UserId != userId)
+            if (loan == null || loan.UserId != userId)
                 return RedirectToAction("Index", "Home");
 
             // Obtener cuota pendiente
-            var cuotaPendiente = prestamo.Installments?
+            var pendingInstallment = loan.Installments?
                 .FirstOrDefault(i => !i.IsPaid);
 
-            if (cuotaPendiente == null)
+            if (pendingInstallment == null)
             {
                 TempData["Info"] = "No hay cuotas pendientes de pago.";
-                return RedirectToAction("Detalle", new { id });
+                return RedirectToAction("Detail", new { id });
             }
 
-            ViewBag.PrestamoId = id;
-            ViewBag.MontoCuota = cuotaPendiente.PaymentAmount;
-            ViewBag.FechaVencimiento = cuotaPendiente.DueDate;
+            ViewBag.LoanId = id;
+            ViewBag.InstallmentAmount = pendingInstallment.PaymentAmount;
+            ViewBag.DueDate = pendingInstallment.DueDate;
 
-            return View(prestamo);
+            return View(loan);
         }
     }
 }

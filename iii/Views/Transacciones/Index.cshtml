@@ -11,37 +11,37 @@
     <form method="get" class="row g-3 mb-4 shadow-sm p-3 bg-light rounded">
         <div class="col-md-2">
             <label class="form-label">Tipo</label>
-            <select name="tipo" class="form-control form-select">
+            <select name="type" class="form-control form-select">
                 <option value="">Todos</option>
-                <option value="1" selected="@(ViewBag.Tipo == 1)">Depósito</option>
-                <option value="2" selected="@(ViewBag.Tipo == 2)">Retiro</option>
-                <option value="3" selected="@(ViewBag.Tipo == 3)">Transferencia</option>
-                <option value="4" selected="@(ViewBag.Tipo == 4)">Pago Préstamo</option>
-                <option value="5" selected="@(ViewBag.Tipo == 5)">Pago Tarjeta</option>
-                <option value="6" selected="@(ViewBag.Tipo == 6)">Avance de Efectivo</option>
+                <option value="1" selected="@(ViewBag.Type == 1)">Depósito</option>
+                <option value="2" selected="@(ViewBag.Type == 2)">Retiro</option>
+                <option value="3" selected="@(ViewBag.Type == 3)">Transferencia</option>
+                <option value="4" selected="@(ViewBag.Type == 4)">Pago Préstamo</option>
+                <option value="5" selected="@(ViewBag.Type == 5)">Pago Tarjeta</option>
+                <option value="6" selected="@(ViewBag.Type == 6)">Avance de Efectivo</option>
             </select>
         </div>
         <div class="col-md-2">
             <label class="form-label">Desde</label>
-            <input type="date" name="desde" class="form-control" value="@ViewBag.Desde" />
+            <input type="date" name="from" class="form-control" value="@ViewBag.From" />
         </div>
         <div class="col-md-2">
             <label class="form-label">Hasta</label>
-            <input type="date" name="hasta" class="form-control" value="@ViewBag.Hasta" />
+            <input type="date" name="to" class="form-control" value="@ViewBag.To" />
         </div>
         <div class="col-md-3">
             <label class="form-label">Producto</label>
-            <select name="productoId" class="form-control form-select">
+            <select name="productId" class="form-control form-select">
                 <option value="">Todos</option>
-                @foreach (var p in ViewBag.Productos)
+                @foreach (var p in ViewBag.Products)
                 {
-                    <option value="@p.Id" selected="@(ViewBag.ProductoId == p.Id)">@p.Name</option>
+                    <option value="@p.Id" selected="@(ViewBag.ProductId == p.Id)">@p.Name</option>
                 }
             </select>
         </div>
         <div class="col-md-2">
             <label class="form-label">Búsqueda</label>
-            <input type="text" name="referencia" class="form-control" placeholder="ID, origen, monto..." value="@ViewBag.Referencia" />
+            <input type="text" name="reference" class="form-control" placeholder="ID, origen, monto..." value="@ViewBag.Reference" />
         </div>
         <div class="col-md-1 d-flex align-items-end">
             <button type="submit" class="btn btn-primary w-100">Filtrar</button>
@@ -50,15 +50,15 @@
 
     <!-- EXPORTAR -->
     <form method="post" class="mb-4 d-flex gap-2">
-        <input type="hidden" name="tipo" value="@ViewBag.Tipo" />
-        <input type="hidden" name="desde" value="@ViewBag.Desde" />
-        <input type="hidden" name="hasta" value="@ViewBag.Hasta" />
-        <input type="hidden" name="productoId" value="@ViewBag.ProductoId" />
-        <input type="hidden" name="referencia" value="@ViewBag.Referencia" />
-        <button formaction="ExportarPdf" class="btn btn-danger">
+        <input type="hidden" name="type" value="@ViewBag.Type" />
+        <input type="hidden" name="from" value="@ViewBag.From" />
+        <input type="hidden" name="to" value="@ViewBag.To" />
+        <input type="hidden" name="productId" value="@ViewBag.ProductId" />
+        <input type="hidden" name="reference" value="@ViewBag.Reference" />
+        <button formaction="ExportPdf" class="btn btn-danger">
             PDF
         </button>
-        <button formaction="ExportarExcel" class="btn btn-success">
+        <button formaction="ExportExcel" class="btn btn-success">
             Excel
         </button>
     </form>
@@ -173,11 +173,11 @@
     <div class="d-flex justify-content-center mt-4">
         @Html.PagedListPager(Model, page => Url.Action("Index", new
         {
-            tipo = ViewBag.Tipo,
-                desde = ViewBag.Desde,
-                hasta = ViewBag.Hasta,
-                productoId = ViewBag.ProductoId,
-                referencia = ViewBag.Referencia,
+            type = ViewBag.Type,
+                from = ViewBag.From,
+                to = ViewBag.To,
+                productId = ViewBag.ProductId,
+                reference = ViewBag.Reference,
                 page
                 }),
                 new PagedListRenderOptions
@@ -198,8 +198,8 @@
         // Mantener foco en búsqueda al filtrar
         document.addEventListener("DOMContentLoaded", function () {
             const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('referencia')) {
-                document.querySelector('input[name="referencia"]').focus();
+            if (urlParams.has('reference')) {
+                document.querySelector('input[name="reference"]').focus();
             }
         });
     </script>

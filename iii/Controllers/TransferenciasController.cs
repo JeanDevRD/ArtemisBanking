@@ -6,13 +6,13 @@ using System.Security.Claims;
 namespace ArtemisBankingWebApp.Controllers
 {
     [Authorize(Roles = "cliente")]
-    public class TransferenciasController : Controller
+    public class TransfersController : Controller
     {
         private readonly ISavingsAccountService _savingsAccountService;
         private readonly IBeneficiaryService _beneficiaryService;
         private readonly ITransactionService _transactionService;
 
-        public TransferenciasController(
+        public TransfersController(
             ISavingsAccountService savingsAccountService,
             IBeneficiaryService beneficiaryService,
             ITransactionService transactionService)
@@ -23,32 +23,32 @@ namespace ArtemisBankingWebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(int? cuentaId)
+        public async Task<IActionResult> Index(int? accountId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             // Obtener cuentas del usuario
-            var cuentas = await _savingsAccountService.GetAllAsync();
-            var misCuentas = cuentas.Where(c => c.UserId == userId).ToList();
+            var accounts = await _savingsAccountService.GetAllAsync();
+            var myAccounts = accounts.Where(c => c.UserId == userId).ToList();
 
-            // Si viene cuentaId, verificar que exista y pertenezca al usuario
-            if (cuentaId.HasValue)
+            // Si viene accountId, verificar que exista y pertenezca al usuario
+            if (accountId.HasValue)
             {
-                var cuenta = misCuentas.FirstOrDefault(c => c.Id == cuentaId.Value);
-                if (cuenta == null)
+                var account = myAccounts.FirstOrDefault(c => c.Id == accountId.Value);
+                if (account == null)
                     return RedirectToAction("Index", "Home");
 
-                ViewBag.CuentaOrigenId = cuentaId.Value;
-                ViewBag.CuentaOrigenNumero = cuenta.AccountNumber;
-                ViewBag.SaldoDisponible = cuenta.Balance;
+                ViewBag.SourceAccountId = accountId.Value;
+                ViewBag.SourceAccountNumber = account.AccountNumber;
+                ViewBag.AvailableBalance = account.Balance;
             }
 
             // Obtener beneficiarios del usuario
-            var beneficiarios = await _beneficiaryService.GetAllAsync();
-            var misBeneficiarios = beneficiarios.Where(b => b.UserId == userId).ToList();
+            var beneficiaries = await _beneficiaryService.GetAllAsync();
+            var myBeneficiaries = beneficiaries.Where(b => b.UserId == userId).ToList();
 
-            ViewBag.Cuentas = misCuentas;
-            ViewBag.Beneficiarios = misBeneficiarios;
+            ViewBag.Accounts = myAccounts;
+            ViewBag.Beneficiaries = myBeneficiaries;
 
             return View();
         }
