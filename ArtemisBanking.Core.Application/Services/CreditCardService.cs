@@ -16,16 +16,15 @@ namespace ArtemisBanking.Core.Application.Services
     public class CreditCardService : GenericService<CreditCardDto, CreditCard>, ICreditCardService
     {
         private readonly ICreditCardRepository _creditCardRepository;
-        private readonly ICardTransactionRepository _cardTransactionRepository;
         private readonly IEmailService _emailService;
         private readonly IAccountServiceForApp _userForApp;
         private readonly IMapper _mapper;
-        public CreditCardService(ICreditCardRepository genericRepository, IMapper mapper, IAccountServiceForApp userForAp, ICardTransactionRepository cardTransactionRepository, IEmailService emailService) : base(genericRepository, mapper)
+        public CreditCardService(ICreditCardRepository genericRepository, IMapper mapper, IAccountServiceForApp userForAp, ICardTransactionRepository cardTransactionRepository, 
+            IEmailService emailService) : base(genericRepository, mapper)
         {
             _creditCardRepository = genericRepository;
             _mapper = mapper;
             _userForApp = userForAp;
-            _cardTransactionRepository = cardTransactionRepository;
             _emailService = emailService;
         }
         public override async Task<CreditCardDto> GetByIdAsync(int id)
@@ -71,11 +70,8 @@ namespace ArtemisBanking.Core.Application.Services
 
             try
             {
-                var creditCards = await _creditCardRepository
-                    .GetAllQueryAsync()
-                    .Where(x => x.IsActive)
-                    .OrderByDescending(x => x.CreateAt)
-                    .ToListAsync();
+                var creditCards = await _creditCardRepository.GetAllQueryAsync()
+                    .Where(x => x.IsActive).OrderByDescending(x => x.CreateAt).ToListAsync();
 
                 var dtoList = _mapper.Map<List<CreditCardListDto>>(creditCards);
 
@@ -152,9 +148,11 @@ namespace ArtemisBanking.Core.Application.Services
             return result;
         }
 
-        public async Task<bool> CancelatedCreditCard(int creditCardId)
+        public async Task<bool> CancelatedCreditCard(string creditCardId)
         {
-            var creditCard = await _creditCardRepository.GetByIdAsync(creditCardId);
+            var cards = await _creditCardRepository.GetAllListAsync();
+
+            var creditCard = cards.FirstOrDefault(c => c.CardNumber == creditCardId);
 
             if (creditCard == null)
                 return false; 
@@ -188,17 +186,12 @@ namespace ArtemisBanking.Core.Application.Services
 
                 foreach (var user in activeUsers)
                 {
-                    // Verificar si ya tiene tarjeta activa
-                    var hasActiveCard = await _creditCardRepository
-                        .GetAllQueryAsync()
-                        .AnyAsync(c => c.UserId == user.Id && c.IsActive);
+                    var hasActiveCard = await _creditCardRepository.GetAllQueryAsync().AnyAsync(c => c.UserId == user.Id && c.IsActive);
 
                     if (!hasActiveCard)
                     {
-                        var totalDebt = await _creditCardRepository
-                            .GetAllQueryAsync()
-                            .Where(c => c.UserId == user.Id)
-                            .SumAsync(c => c.CurrentDebt);
+                        var totalDebt = await _creditCardRepository.GetAllQueryAsync()
+                            .Where(c => c.UserId == user.Id).SumAsync(c => c.CurrentDebt);
 
                         var dto = _mapper.Map<ElegibleUserForCreditCardDto>(user);
                         dto.FullName = $"{user.FirstName} {user.LastName}";
@@ -337,13 +330,15 @@ namespace ArtemisBanking.Core.Application.Services
         }
 
 
-        public async Task<ResultDto<CreditCardDto>> UpdateCard(UpdateCreditCardDto dto, int creditCardId)
+        public async Task<ResultDto<CreditCardDto>> UpdateCard(UpdateCreditCardDto dto, string creditCardId)
         {
             var result = new ResultDto<CreditCardDto>();
 
             try 
             {
-                var creditCard = await _creditCardRepository.GetByIdAsync(creditCardId);
+
+                var creditCards = await _creditCardRepository.GetAllListAsync();
+                var creditCard = creditCards.FirstOrDefault(c => c.CardNumber == creditCardId);
 
                 if (creditCard == null) 
                 { 
@@ -391,7 +386,7 @@ namespace ArtemisBanking.Core.Application.Services
 
         }
 
-        public async Task<ResultDto<CreditCardDetailDto>> DetailCard(int idCreditCard)
+        public async Task<ResultDto<CreditCardDetailDto>> DetailCard(string idCreditCard)
         {
             var result = new ResultDto<CreditCardDetailDto>();
 
@@ -402,7 +397,7 @@ namespace ArtemisBanking.Core.Application.Services
 
                 var query = _creditCardRepository.GetQueryWithIncluide(includes);
 
-                var card = await query.FirstOrDefaultAsync(c => c.Id == idCreditCard);
+                var card = await query.FirstOrDefaultAsync(c => c.CardNumber == idCreditCard);
 
                 if (card == null)
                 {
@@ -412,14 +407,13 @@ namespace ArtemisBanking.Core.Application.Services
 
                 var resultDto = _mapper.Map<CreditCardDetailDto>(card);
 
-                resultDto.consumptions = card!.CardTransactions?
-                .OrderByDescending(t => t.Date)
+                resultDto.consumptions = card.CardTransactions?.OrderByDescending(t => t.Date)
                 .Select(t => new ConsumptionDto
-                {
-                    consumptionDate = t.Date,
-                    amount = t.Amount,
-                    merchant = string.IsNullOrEmpty(t.Merchant) ? "AVANCE" : t.Merchant,
-                    status = t.Status
+                 {
+                 consumptionDate = t.Date,
+                 amount = t.Amount,
+                 merchant = string.IsNullOrEmpty(t.Merchant) ? "AVANCE" : t.Merchant,
+                 status = t.Status
                 }).ToList() ?? new List<ConsumptionDto>();
 
                 result.Result = resultDto;

@@ -423,7 +423,7 @@ namespace ArtemisBanking.Infraestructure.Identity.Services
         {
             List<UserDto> listUsersDtos = new();
 
-            var users = _userManager.Users.Where(w => w.EmailConfirmed);
+            var users = _userManager.Users;
 
             var listUser = await users.ToListAsync();
 

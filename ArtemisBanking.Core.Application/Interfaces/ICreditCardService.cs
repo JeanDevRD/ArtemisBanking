@@ -10,11 +10,11 @@ namespace ArtemisBanking.Core.Application.Interfaces
         Task<List<CreditCardDto>> GetAllWithInclude();
         Task<ResultDto<List<CreditCardListDto>>> GetAllActiveCreditCard();
         Task<ResultDto<List<CreditCardListDto>>> GetAllCreditCardByIdentityUser(string identificationNumber, bool? isActive = null);
-        Task<bool> CancelatedCreditCard(int creditCardId);
+        Task<bool> CancelatedCreditCard(string creditCardId);
         Task<ResultDto<List<ElegibleUserForCreditCardDto>>> GetElegibleUserForCreditCard();
         Task<ResultDto<ElegibleUserForCreditCardDto>> GetElegibleUserByIdentityForCreditCard(string identificationNumber);
         Task<ResultDto<CreditCardDto>> AddCreditCardAsync(CreditCardRequestDto request, string adminUserId);
-        Task<ResultDto<CreditCardDto>> UpdateCard(UpdateCreditCardDto dto, int creditCardId);
-        Task<ResultDto<CreditCardDetailDto>> DetailCard(int idCreditCard);
+        Task<ResultDto<CreditCardDto>> UpdateCard(UpdateCreditCardDto dto, string creditCardId);
+        Task<ResultDto<CreditCardDetailDto>> DetailCard(string idCreditCard);
     }
 }

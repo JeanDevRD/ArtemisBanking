@@ -80,7 +80,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetCreditCardDetail(int id)
+        public async Task<IActionResult> GetCreditCardDetail(string id)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
                 return Ok(result.Result);
             }
             catch (Exception ex)
-            {
+            { 
                 return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
             }
         }
@@ -143,7 +143,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateCreditLimit(int id, [FromBody] UpdateCreditCardDto dto)
+        public async Task<IActionResult> UpdateCreditLimit(string id, [FromBody] UpdateCreditCardDto dto)
         {
             try
             {
@@ -179,7 +179,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CancelCreditCard(int id)
+        public async Task<IActionResult> CancelCreditCard(string id)
         {
             try
             {

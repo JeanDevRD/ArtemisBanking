@@ -2,7 +2,7 @@
 {
     public class CancelCreditCardViewModel
     {
-        public int CardId { get; set; }
+        public string CardId { get; set; } = "";
         public string LastDigits { get; set; } = "";
         public bool CanCancel { get; set; }
     }

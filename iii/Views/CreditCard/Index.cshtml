@@ -1,0 +1,131 @@
+﻿@using ArtemisBanking.Core.Application.ViewModels.CreditCard
+@model HomeCreditCardViewModel
+
+@{
+    ViewData["Title"] = "Gestión de Tarjetas de Crédito";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+
+    <h3 class="mb-4">Gestión de Tarjetas de Crédito</h3>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <form method="get" class="row g-3 mb-4 shadow-sm p-3 bg-light rounded">
+
+        <div class="col-md-4">
+            <label class="form-label">Buscar por cédula</label>
+            <input type="text"name="identificationNumber"class="form-control"value="@Model.FilterIdentificationNumber"placeholder="000-0000000-0" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Estado</label>
+            <select name="isActive" class="form-select">
+                <option value="">Todas</option>
+                <option value="true" selected="@(Model.IsActive == true)">Activas</option>
+                <option value="false" selected="@(Model.IsActive == false)">Canceladas</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+            <a asp-action="SelectClient" class="btn btn-success w-100">
+                <i class="bi bi-credit-card-2-front"></i> Asignar Tarjeta
+            </a>
+        </div>
+
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover shadow-sm">
+
+            <thead class="table-dark">
+                <tr>
+                    <th>Número de Tarjeta</th>
+                    <th>Titular</th>
+                    <th>Límite de Crédito</th>
+                    <th>Fecha de Expiración</th>
+                    <th>Deuda Actual</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model.Cards != null && Model.Cards.Any())
+                {
+                    foreach (var card in Model.Cards)
+                    {
+                        var lastFour = card.CardNumber.Length >= 4
+                        ? card.CardNumber[^4..]
+                        : card.CardNumber;
+
+                        <tr>
+                            <td>****-****-****-@lastFour</td>
+                            <td>@card.FullNameUser</td>
+                            <td>@card.CreditLimit.ToString("C2")</td>
+                            <td>@card.ExpirationDate.ToString("MM/yy")</td>
+
+                            <td>
+                                <span class="badge bg-@(card.CurrentDebt > 0 ? "warning" : "success")">
+                                    @card.CurrentDebt.ToString("C2")
+                                </span>
+                            </td>
+
+                            <td>
+                                <a asp-action="Detail" asp-route-cardId="@card.CardNumber" class="btn btn-sm btn-info">Ver Detalles</a>
+                                <a asp-action="Edit" asp-route-cardId="@card.CardNumber" class="btn btn-sm btn-warning">Editar</a>
+                                <a asp-action="Cancel"asp-route-cardId="@card.CardNumber"class="btn btn-sm btn-danger">Cancelar</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            No se encontraron tarjetas de crédito con los filtros aplicados.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link"asp-action="Index" asp-route-pageNumber="@i"
+                               asp-route-identificationNumber="@Model.FilterIdentificationNumber" asp-route-isActive="@Model.IsActive"> @i </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
+
+</div>

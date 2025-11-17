@@ -1,0 +1,87 @@
+﻿@using ArtemisBanking.Core.Application.ViewModel.CreditCard
+@model CreditCardDetailViewModel
+
+@{
+    ViewData["Title"] = "Detalle de Tarjeta";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">Detalle de Tarjeta @Model.cardNumberMasked</h3>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-credit-card"></i> Información de la Tarjeta
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Número:</strong> @Model.cardNumberMasked</p>
+                    <p><strong>ID Tarjeta:</strong> #@Model.cardId</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Historial de Consumos</h4>
+    <div class="table-responsive">
+        <table class="table table-striped shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Monto</th>
+                    <th>Comercio</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.consumptions != null && Model.consumptions.Any())
+                {
+                    @foreach (var consumption in Model.consumptions)
+                    {
+                        <tr class="@(consumption.status == 2 ? "table-danger" : "")">
+                            <td>@consumption.consumptionDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td><strong>@consumption.amount.ToString("C2")</strong></td>
+                            <td>
+                                @if (consumption.merchant == "AVANCE")
+                                {
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-cash"></i> AVANCE DE EFECTIVO
+                                    </span>
+                                }
+                                else
+                                {
+                                    @consumption.merchant
+                                }
+                            </td>
+                            <td>
+                                @if (consumption.status == 1)
+                                {
+                                    <span class="badge bg-success">APROBADO</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">RECHAZADO</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">No hay consumos registrados para esta tarjeta</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Listado
+        </a>
+    </div>
+</div>

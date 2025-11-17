@@ -24,11 +24,9 @@ namespace ArtemisBankingWebApp.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Obtener tarjetas del usuario
             var tarjetas = await _creditCardService.GetAllWithInclude();
             var misTarjetas = tarjetas.Where(t => t.UserId == userId && t.IsActive).ToList();
 
-            // Si viene tarjetaId, verificar que exista y pertenezca al usuario
             if (tarjetaId.HasValue)
             {
                 var tarjeta = misTarjetas.FirstOrDefault(t => t.Id == tarjetaId.Value);

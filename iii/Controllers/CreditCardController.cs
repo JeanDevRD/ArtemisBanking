@@ -1,9 +1,11 @@
 ﻿using ArtemisBanking.Core.Application.Dtos.CreditCard;
 using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Application.ViewModel.CreditCard;
+using ArtemisBanking.Core.Application.ViewModel.Loan;
 using ArtemisBanking.Core.Application.ViewModels.CreditCard;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ArtemisBankingWebApp.Controllers
 {
@@ -17,6 +19,8 @@ namespace ArtemisBankingWebApp.Controllers
             _creditCardService = creditCardService;
             _mapper = mapper;
         }
+
+
 
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 20, string? identificationNumber = null, bool? isActive = null)
         {
@@ -58,7 +62,16 @@ namespace ArtemisBankingWebApp.Controllers
                 return View("Create", vm);
 
             var dto = _mapper.Map<CreditCardRequestDto>(vm);
-            var result = await _creditCardService.AddCreditCardAsync(dto, "ADMIN_ID");
+
+            string? adminUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (adminUserId == null)
+            {
+                ModelState.AddModelError(string.Empty, "No se pudo identificar al administrador.");
+                return View("Create", vm);
+            }
+
+            var result = await _creditCardService.AddCreditCardAsync(dto, adminUserId);
 
             if (result.IsError)
             {
@@ -70,7 +83,7 @@ namespace ArtemisBankingWebApp.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Detail(int cardId)
+        public async Task<IActionResult> Detail(string cardId)
         {
             var result = await _creditCardService.DetailCard(cardId);
 
@@ -84,9 +97,12 @@ namespace ArtemisBankingWebApp.Controllers
             return View("Detail", vm);
         }
 
-        public async Task<IActionResult> Edit(int cardId)
+        public async Task<IActionResult> Edit(string cardId)
         {
-            var card = await _creditCardService.GetByIdAsync(cardId);
+            var cards = await _creditCardService.GetAllAsync();
+
+            var card = cards.FirstOrDefault(c => c.CardNumber == cardId);
+
             if (card == null)
                 return RedirectToAction("Index");
 
@@ -96,10 +112,9 @@ namespace ArtemisBankingWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int cardId, UpdateCreditCardViewModel vm)
+        public async Task<IActionResult> Edit(string cardId, UpdateCreditCardViewModel vm)
         {
-            if (!ModelState.IsValid)
-                return View("Edit", vm);
+            if (!ModelState.IsValid) return View("Edit", vm);
 
             var dto = _mapper.Map<UpdateCreditCardDto>(vm);
             var result = await _creditCardService.UpdateCard(dto, cardId);
@@ -114,9 +129,11 @@ namespace ArtemisBankingWebApp.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Cancel(int cardId)
+        public async Task<IActionResult> Cancel(string cardId)
         {
-            var card = await _creditCardService.GetByIdAsync(cardId);
+            var cards = await _creditCardService.GetAllAsync();
+            var card = cards.FirstOrDefault(c => c.CardNumber == cardId);
+
             if (card == null)
                 return RedirectToAction("Index");
 
@@ -131,7 +148,7 @@ namespace ArtemisBankingWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CancelConfirmed(int cardId)
+        public async Task<IActionResult> CancelConfirmed(string cardId)
         {
             var success = await _creditCardService.CancelatedCreditCard(cardId);
 
@@ -143,6 +160,27 @@ namespace ArtemisBankingWebApp.Controllers
 
             TempData["Success"] = "Tarjeta cancelada exitosamente.";
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> SelectClient(string Cedula)
+        {
+
+            var result = await _creditCardService.GetElegibleUserForCreditCard();
+
+            if (result.IsError || result.Result == null)
+            {
+                TempData["Error"] = result.Message ?? result.Message;
+                return RedirectToAction("Index");
+            }
+            var clients = _mapper.Map<List<ElegibleUserForCreditCardViewModel>>(result.Result);
+
+            if (Cedula != null)
+            {
+                clients = clients.Where(c => c.IdentificationNumber == Cedula).ToList();
+            }
+
+            return View("SelectClient", clients);
+
         }
     }
 }

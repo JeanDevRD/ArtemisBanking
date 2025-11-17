@@ -86,15 +86,8 @@ namespace ArtemisBanking.Core.Application.Services
                 }
 
                 var inactive = client.Where(x => x.IsActive == false).Count();
-                if (inactive == 0)
-                {
-                    result.IsError = true;
-                    result.Message = "No hay clientes inactivos";
-                    return result;
-                }
-
-
-                var clients = new TotalClientsDto
+                
+                result.Result = new TotalClientsDto
                 {
                     TotalClientsActive = active,
                     TotalClientsInactive = inactive

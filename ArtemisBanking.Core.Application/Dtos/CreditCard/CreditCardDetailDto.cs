@@ -8,8 +8,8 @@ namespace ArtemisBanking.Core.Application.Dtos.CreditCard
 {
     public class CreditCardDetailDto
     {
-        public required string cardId;                
-        public required string cardNumberMasked;       
-        public List<ConsumptionDto>? consumptions;
+        public required string cardId { get; set; }
+        public required string cardNumberMasked { get; set; }
+        public List<ConsumptionDto>? consumptions { get; set; } = new List<ConsumptionDto>();
     }
 }

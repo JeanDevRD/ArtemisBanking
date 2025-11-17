@@ -1,0 +1,48 @@
+﻿@using ArtemisBanking.Core.Application.ViewModels.CreditCard
+@model CancelCreditCardViewModel
+
+@{
+    ViewData["Title"] = "Cancelar Tarjeta";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4 col-md-6">
+    <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Confirmación de Cancelación</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>¿Está seguro que desea cancelar la tarjeta ****@Model.LastDigits?</strong>
+            </div>
+
+            @if (!Model.CanCancel)
+            {
+                <div class="alert alert-danger">
+                    <strong>No se puede cancelar esta tarjeta:</strong>
+                    <p class="mb-0">
+                        Para cancelar esta tarjeta, el cliente debe saldar la totalidad de la deuda pendiente.
+                    </p>
+                </div>
+                <a asp-action="Index" class="btn btn-secondary w-100">Volver al Listado</a>
+            }
+            else
+            {
+                <p class="text-muted">
+                    Esta acción es permanente. Una vez cancelada, la tarjeta no podrá ser utilizada para nuevos consumos o pagos.
+                </p>
+
+                <form asp-action="CancelConfirmed" asp-route-cardId="@Model.CardId" method="post">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Confirmar Cancelación
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

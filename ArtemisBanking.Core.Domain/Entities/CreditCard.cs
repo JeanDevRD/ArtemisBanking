@@ -11,7 +11,7 @@ namespace ArtemisBanking.Core.Domain.Entities
         public decimal CreditLimit { get; set; }
         public decimal CurrentDebt { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public DateTime CreateAt { get; set; }
+        public required DateTime CreateAt { get; set; }
         public bool IsActive { get; set; } = true;
         public required string UserId { get; set; }
         public required string AssignedByUserId { get; set; }

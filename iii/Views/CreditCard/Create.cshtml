@@ -1,0 +1,62 @@
+﻿@using ArtemisBanking.Core.Application.ViewModel.CreditCard
+@model CreditCardRequestViewModel
+
+@{
+    ViewData["Title"] = "Asignar Tarjeta de Crédito";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4 col-md-6">
+    <h3 class="mb-3">Configurar Tarjeta de Crédito</h3>
+
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        <strong>Cliente seleccionado:</strong> ID @Model.IdCliente
+    </div>
+
+    <form asp-action="Create" method="post" class="shadow-sm p-4 bg-light rounded">
+
+        <input type="hidden" asp-for="IdCliente" />
+
+        <div class="form-group mb-3">
+            <label class="fw-bold">Límite de Crédito</label>
+
+            <div class="input-group">
+                <span class="input-group-text">RD$</span>
+                <input asp-for="CreditLimit" type="number" step="0.01" value="" min="0.01" class="form-control" placeholder="Ej: 50000.00"required />
+            </div>
+
+            <span asp-validation-for="CreditLimit" class="text-danger"></span>
+
+            <small class="text-muted"> Ingrese el límite de crédito inicial para esta tarjeta.</small>
+        </div>
+
+        <div class="card mb-3 bg-light">
+            <div class="card-body">
+                <h6 class="card-title mb-2">
+                    <i class="bi bi-credit-card"></i> Información Automática
+                </h6>
+                <ul class="mb-0 small">
+                    <li>Se generará un número de tarjeta único de 16 dígitos.</li>
+                    <li>El código CVC será generado y encriptado automáticamente.</li>
+                    <li>Fecha de expiración: 3 años desde hoy.</li>
+                    <li>La tarjeta se creará en estado activo.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-credit-card-2-front"></i> Asignar Tarjeta
+            </button>
+
+            <a asp-action="SelectClient" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a Selección
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

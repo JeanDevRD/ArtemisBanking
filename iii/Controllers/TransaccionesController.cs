@@ -2,7 +2,6 @@
 using ArtemisBanking.Core.Application.Dtos.Transaction;
 using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Domain.Common.Enum;
-using ArtemisBanking.Core.Domain.Enum;
 using iText.IO.Font.Constants;
 using iText.Kernel.Font;
 using iText.Kernel.Pdf;
@@ -12,7 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using System.Security.Claims;
-using X.PagedList;
 using X.PagedList.Extensions;
 
 namespace ArtemisBankingWebApp.Controllers
