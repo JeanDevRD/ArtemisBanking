@@ -167,7 +167,7 @@ namespace ArtemisBankingWebApp.Controllers
                 AdminUserId = HttpContext.Session.GetString("UserId")
             };
 
-            return View(viewModel);
+            return View("CreateSecondary", viewModel);
         }
 
     }

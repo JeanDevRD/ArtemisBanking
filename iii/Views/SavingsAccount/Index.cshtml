@@ -99,13 +99,13 @@
                                 </span>
                             </td>
                             <td>
-                                <a asp-action="Detail" asp-route-accountId="@account.AccountId"
+                                <a asp-action="Detail" asp-route-accountId="@account.AccountNumber"
                                    class="btn btn-sm btn-info"> <i class="bi bi-eye"></i> Ver Detalles
                                 </a>
 
                                 @if (!account.IsPrincipal && account.IsActive)
                                 {
-                                    <a asp-action="Cancel" asp-route-accountId="@account.AccountId"
+                                    <a asp-action="Cancel" asp-route-accountId="@account.AccountNumber"
                                        class="btn btn-sm btn-danger"> <i class="bi bi-x-circle"></i> Cancelar
                                     </a>
                                 }
