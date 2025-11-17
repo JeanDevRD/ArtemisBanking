@@ -1,0 +1,46 @@
+﻿@model HomeCasherViewModel
+@{
+    ViewData["Title"] = "Home Cajero";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4 text-center">Panel del Cajero</h2>
+
+    <div class="row text-center">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Transacciones totales</h5>
+                    <h2 class="text-primary">@Model.TotalTransaction.TotalCountTransaction</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Depósitos</h5>
+                    <h2 class="text-success">@Model.TotalDeposit.TotalCountDeposit</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Retiros</h5>
+                    <h2 class="text-danger">@Model.TotalWithdrawal.TotalCountWithdrawal</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">Pagos</h5>
+                    <h2 class="text-warning">@Model.TotalPaids.TotalCountPaids</h2>
+                </div>
+            </div>
+        </div>
+    </div>    
+    
+</div>
+
+

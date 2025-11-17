@@ -1,0 +1,21 @@
+﻿@model TransactionConfirmViewModel
+@{
+    ViewData["Title"] = "Confirmar Retiro";
+}
+
+<div class="container mt-4">
+    <h2>Confirmar Retiro</h2>
+
+    <p><strong>Cuenta:</strong> @Model.AccountNumber</p>
+    <p><strong>Titular:</strong> @Model.HolderName</p>
+    <p><strong>Monto:</strong> @Model.Amount.ToString("C")</p>
+
+    <form asp-action="ConfirmWithdrawal" method="post">
+        <input type="hidden" asp-for="AccountNumber" />
+        <input type="hidden" asp-for="Amount" />
+        <input type="hidden" asp-for="HolderName" />
+
+        <button type="submit" class="btn btn-primary">Aceptar</button>
+        <button type="submit" asp-action="CancelOperation" class="btn btn-secondary">Cancelar</button>
+    </form>
+</div>

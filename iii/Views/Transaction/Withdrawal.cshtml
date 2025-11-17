@@ -1,0 +1,25 @@
+﻿@model WithdrawalTransactionViewModel
+@{
+    ViewData["Title"] = "Retiro";
+}
+
+<div class="container mt-4">
+    <h2>Realizar Retiro</h2>
+
+    <form asp-action="Withdrawal" method="post" class="mt-3">
+        <div class="mb-3">
+            <label asp-for="AccountNumber" class="form-label">Número de cuenta origen</label>
+            <input asp-for="AccountNumber" class="form-control" />
+            <span asp-validation-for="AccountNumber" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Amount" class="form-label">Monto a retirar</label>
+            <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+            <span asp-validation-for="Amount" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-success">Continuar</button>
+        <a asp-controller="CasherDashboard" asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
