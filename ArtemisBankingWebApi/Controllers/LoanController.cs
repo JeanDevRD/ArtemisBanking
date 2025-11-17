@@ -1,7 +1,8 @@
-﻿using Asp.Versioning;
-using ArtemisBanking.Core.Application.Dtos.Loan;
+﻿using ArtemisBanking.Core.Application.Dtos.Loan;
 using ArtemisBanking.Core.Application.Interfaces;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArtemisBankingWebApi.Controllers.v1
@@ -96,7 +97,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetLoanDetail(int id)
+        public async Task<IActionResult> GetLoanDetail(string id)
         {
             try
             {
@@ -131,6 +132,14 @@ namespace ArtemisBankingWebApi.Controllers.v1
                     return BadRequest(ModelState);
                 }
 
+                var adminId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+                if (adminId == null)
+                {
+                    return Unauthorized(new { message = "No se pudo identificar al usuario administrador." });
+                }
+                dto.ApprovedByUserId = adminId;
+
                 var result = await _loanService.AddLoanAsync(dto);
 
                 if (result.IsError)
@@ -158,7 +167,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateInterestRate(int id, [FromBody] UpdateInterestRateDto dto)
+        public async Task<IActionResult> UpdateInterestRate(string id, [FromBody] UpdateInterestRateDto dto)
         {
             try
             {

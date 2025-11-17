@@ -1,0 +1,100 @@
+﻿@using ArtemisBanking.Core.Application.ViewModel.Loan
+@model List<ElegibleUserForCreditCardViewModel>
+@{
+    ViewData["Title"] = "Seleccionar Cliente";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Seleccionar Cliente para Cuenta de Ahorro Secundaria</h1>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle"></i>
+                <strong>Nota:</strong> Solo se puede asignar una cuenta secundaria a clientes activos.
+                Las cuentas principales se crean automáticamente al registrar un cliente.
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <form method="get" asp-action="SelectClient">
+                        <div class="input-group">
+                            <input type="text"
+                                   name="searchCedula"
+                                   class="form-control"
+                                   value="@ViewBag.SearchCedula"
+                                   placeholder="Buscar por cédula (Ej: 00000000003)">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Buscar
+                            </button>
+                            @if (!string.IsNullOrEmpty(ViewBag.SearchCedula))
+                            {
+                                <a asp-action="SelectClient" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Limpiar
+                                </a>
+                            }
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover" id="dataTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Cédula</th>
+                            <th>Nombre Completo</th>
+                            <th>Correo</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var client in Model)
+                            {
+                                <tr>
+                                    <td>@client.IdentificationNumber</td>
+                                    <td>@client.FullName</td>
+                                    <td>@client.Email</td>
+                                    <td>
+                                        <a asp-action="CreateSecondary"
+                                           asp-route-userId="@client.Id"
+                                           class="btn btn-sm btn-primary">
+                                            <i class="fas fa-check"></i> Seleccionar
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">
+                                    @if (string.IsNullOrEmpty(ViewBag.SearchCedula))
+                                    {
+                                        <span>No hay clientes activos disponibles</span>
+                                    }
+                                    else
+                                    {
+                                        <span>No se encontraron clientes con la cédula: @ViewBag.SearchCedula</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-4">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al Listado
+        </a>
+    </div>
+</div>

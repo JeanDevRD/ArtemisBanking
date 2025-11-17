@@ -28,6 +28,18 @@ namespace ArtemisBanking.Core.Application.Mapping.EntityToDtoMapping
            .ForMember(dest => dest.TermInMonths, opt => opt.MapFrom(src => src.TermMonths))
            .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src =>
                src.Installments != null && src.Installments.Any(i => i.IsLate) ? "En mora" : "Al día"));
+
+            CreateMap<Loan, LoanDetailDto>()
+           .ForMember(dest => dest.LoanId, opt => opt.MapFrom(src => src.Id))
+           .ForMember(dest => dest.ClientFullName, opt => opt.Ignore())
+           .ForMember(dest => dest.Installments,
+               opt => opt.MapFrom(src => src.Installments != null
+                   ? src.Installments
+                   : new List<Installment>())); 
+
+           
+            CreateMap<Installment, InstallmentDetailDto>()
+                .ForMember(dest => dest.InstallmentId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }

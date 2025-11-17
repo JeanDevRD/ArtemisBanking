@@ -85,6 +85,15 @@ namespace ArtemisBankingWebApp.Controllers
 
             var dto = _mapper.Map<CreateLoanRequestDto>(vm);
 
+            var adminId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (adminId == null)
+            {
+                return Unauthorized(new { message = "No se pudo identificar al usuario administrador." });
+
+            }
+            dto.ApprovedByUserId = adminId;
+
             var result = await _loanService.AddLoanAsync(dto);
 
             if (result.IsError)

@@ -414,8 +414,7 @@ namespace ArtemisBanking.Core.Application.Services
             var result = new ResultDto<LoanDto>();
             try
             {
-                var loan = await _loanRepository.GetAllQueryAsync()
-                    .Include(l => l.Installments)
+                var loan = await _loanRepository.GetAllQueryAsync().Include(l => l.Installments)
                     .FirstOrDefaultAsync(l => l.Id == loanId);
 
                 if (loan == null)

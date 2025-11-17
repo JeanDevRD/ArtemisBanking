@@ -198,7 +198,7 @@ namespace ArtemisBanking.Core.Application.Services
             return result;
         }
 
-        public async Task<ResultDto<SavingsAccountDetailDto>> GetSavingsAccountDetail(int accountId)
+        public async Task<ResultDto<SavingsAccountDetailDto>> GetSavingsAccountDetail(string accountId)
         {
             var result = new ResultDto<SavingsAccountDetailDto>();
             var clientService = _serviceProvider.GetRequiredService<IAccountServiceForApi>();
@@ -207,7 +207,7 @@ namespace ArtemisBanking.Core.Application.Services
             {
                 var account = await _savingsAccountRepository.GetAllQueryAsync()
                     .Include(a => a.Transactions)
-                    .FirstOrDefaultAsync(a => a.Id == accountId);
+                    .FirstOrDefaultAsync(a => a.AccountNumber == accountId);
 
                 if (account == null)
                 {
@@ -257,14 +257,14 @@ namespace ArtemisBanking.Core.Application.Services
             return result;
         }
 
-        public async Task<ResultDto<SavingsAccountDto>> CancelSecondarySavingsAccount(int accountId)
+        public async Task<ResultDto<SavingsAccountDto>> CancelSecondarySavingsAccount(string accountId)
         {
             var result = new ResultDto<SavingsAccountDto>();
 
             try
             {
                 var account = await _savingsAccountRepository.GetAllQueryAsync()
-                    .FirstOrDefaultAsync(a => a.Id == accountId);
+                    .FirstOrDefaultAsync(a => a.AccountNumber == accountId);
 
                 if (account == null)
                 {

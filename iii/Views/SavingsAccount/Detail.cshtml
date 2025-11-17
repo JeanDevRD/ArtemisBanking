@@ -1,0 +1,105 @@
+﻿@using ArtemisBanking.Core.Application.ViewModels.SavingsAccount
+@model SavingsAccountDetailViewModel
+
+@{
+    ViewData["Title"] = "Detalle de Cuenta";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">Detalle de Cuenta @Model.AccountNumber</h3>
+
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bank"></i> Información de la Cuenta
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Número de Cuenta:</strong> @Model.AccountNumber</p>
+                            <p><strong>Titular:</strong> @Model.ClientFullName</p>
+                            <p>
+                                <strong>Balance Actual:</strong>
+                                <span class="badge bg-success fs-6">@Model.Balance.ToString("C2")</span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>
+                                <strong>Tipo:</strong>
+                                <span class="badge bg-@(Model.AccountType == "Principal" ? "primary" : "secondary")">
+                                    @Model.AccountType
+                                </span>
+                            </p>
+                            <p><strong>ID Cuenta:</strong> #@Model.AccountId</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Historial de Transacciones</h4>
+    <div class="table-responsive">
+        <table class="table table-striped shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Monto</th>
+                    <th>Origen</th>
+                    <th>Beneficiario</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Transactions != null && Model.Transactions.Any())
+                {
+                    foreach (var transaction in Model.Transactions)
+                    {
+                        var statusClass = transaction.Status == "APROBADA" ? "table-success" : "table-danger";
+
+                        <tr class="@statusClass">
+                            <td>@transaction.TransactionDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <span class="badge bg-@(transaction.TransactionType == "CRÉDITO" ? "success" : "warning")">
+                                    @transaction.TransactionType
+                                </span>
+                            </td>
+                            <td><strong>@transaction.Amount.ToString("C2")</strong></td>
+                            <td>@transaction.Origin</td>
+                            <td>@transaction.Beneficiary</td>
+                            <td>
+                                @if (transaction.Status == "APROBADA")
+                                {
+                                    <span class="badge bg-success">APROBADA</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">RECHAZADA</span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            No hay transacciones registradas para esta cuenta
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-3">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Volver al Listado
+        </a>
+    </div>
+</div>

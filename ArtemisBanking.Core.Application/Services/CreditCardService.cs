@@ -393,7 +393,7 @@ namespace ArtemisBanking.Core.Application.Services
             try 
             {
 
-                var includes = new List<string> { nameof(CreditCard.CardTransactions) };
+                var includes = new List<string>{ nameof(CreditCard.CardTransactions) };
 
                 var query = _creditCardRepository.GetQueryWithIncluide(includes);
 

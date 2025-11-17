@@ -1,0 +1,57 @@
+﻿@using ArtemisBanking.Core.Application.ViewModels.SavingsAccount
+@model CancelSavingsAccountViewModel
+
+@{
+    ViewData["Title"] = "Cancelar Cuenta";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4 col-md-6">
+    <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Confirmación de Cancelación</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                <strong>¿Está seguro que desea cancelar la cuenta @Model.AccountNumber?</strong>
+            </div>
+
+            @if (!Model.CanCancel)
+            {
+                <div class="alert alert-danger">
+                    <strong>No se puede cancelar esta cuenta:</strong>
+                    <p class="mb-0">
+                        Las cuentas principales no pueden ser canceladas.
+                        Solo las cuentas secundarias pueden ser eliminadas del sistema.
+                    </p>
+                </div>
+
+                <a asp-action="Index" class="btn btn-secondary w-100">
+                    Volver al Listado
+                </a>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <strong>Proceso de cancelación:</strong>
+                    <ul class="mb-0">
+                        <li>Si la cuenta tiene balance, se transferirá automáticamente a la cuenta principal.</li>
+                        <li>La cuenta quedará inactiva y no se podrá usar para transacciones.</li>
+                        <li>El historial de transacciones se conservará.</li>
+                    </ul>
+                </div>
+
+                <form asp-action="CancelConfirmed" asp-route-accountId="@Model.AccountId" method="post"> @Html.AntiForgeryToken()
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-x-circle"></i> Confirmar Cancelación
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary"> Cancelar </a>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+</div>

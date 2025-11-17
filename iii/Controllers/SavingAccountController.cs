@@ -1,5 +1,6 @@
 ﻿using ArtemisBanking.Core.Application.Dtos.SavingsAccount;
 using ArtemisBanking.Core.Application.Interfaces;
+using ArtemisBanking.Core.Application.ViewModel.Loan;
 using ArtemisBanking.Core.Application.ViewModels.SavingsAccount;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +11,17 @@ namespace ArtemisBankingWebApp.Controllers
     {
         private readonly ISavingsAccountService _savingsService;
         private readonly IMapper _mapper;
+        private readonly IAccountServiceForApp _accountServiceForApp;
 
-        public SavingsAccountController(ISavingsAccountService savingsService, IMapper mapper)
+        public SavingsAccountController(ISavingsAccountService savingsService, IMapper mapper, IAccountServiceForApp account)
         {
             _savingsService = savingsService;
             _mapper = mapper;
+            _accountServiceForApp = account;
         }
 
-        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 20, string? identificationNumber = null, bool? isActive = null, int? accountType = null)
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 20, string? 
+            identificationNumber = null, bool? isActive = null, int? accountType = null)
         {
             var result = await _savingsService.GetSavingAccountHome(identificationNumber, pageNumber, isActive, accountType);
 
@@ -50,7 +54,7 @@ namespace ArtemisBankingWebApp.Controllers
             return View("Index", data);
         }
 
-        public async Task<IActionResult> Detail(int accountId)
+        public async Task<IActionResult> Detail(string accountId)
         {
             var result = await _savingsService.GetSavingsAccountDetail(accountId);
 
@@ -111,7 +115,7 @@ namespace ArtemisBankingWebApp.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CancelConfirmed(int accountId)
+        public async Task<IActionResult> CancelConfirmed(string accountId)
         {
             var result = await _savingsService.CancelSecondarySavingsAccount(accountId);
 
@@ -124,5 +128,47 @@ namespace ArtemisBankingWebApp.Controllers
             TempData["Success"] = $"Cuenta #{result.Result!.AccountNumber} cancelada exitosamente.";
             return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> SelectClient(string? searchCedula)
+        {
+            var result = await _accountServiceForApp.GetAllUser();
+
+            var elegibleClients = result
+                .Where(u => u.Role == "Client" && u.IsActive)
+                .Select(u => new ElegibleUserForCreditCardViewModel
+                {
+                    Id = u.Id,
+                    IdentificationNumber = u.IdentificationNumber,
+                    FullName = $"{u.FirstName} {u.LastName}",
+                    Email = u.Email,
+                    MonthlyIncome = 0
+                })
+                .ToList();
+
+            if (!string.IsNullOrEmpty(searchCedula))
+            {
+                elegibleClients = elegibleClients
+                    .Where(c => c.IdentificationNumber.Contains(searchCedula))
+                    .ToList();
+                ViewBag.SearchCedula = searchCedula;
+            }
+
+            return View(elegibleClients);
+        }
+
+        [HttpGet]
+        public IActionResult CreateSecondary(string userId)
+        {
+            var viewModel = new CreateSecundarySavingsAccountsViewModel
+            {
+                UserId = userId,
+                InitialBalance = 0,
+                AdminUserId = HttpContext.Session.GetString("UserId")
+            };
+
+            return View(viewModel);
+        }
+
     }
 }

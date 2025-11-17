@@ -9,8 +9,8 @@ namespace ArtemisBanking.Core.Application.Interfaces
         Task AddBalance(string userId, decimal amount);
         Task<ResultDto<List<SavingsAccountsHomeDto>>> GetSavingAccountHome(string? identificationNumber, int page, bool? isActive = null, int? accountType = null);
         Task<ResultDto<SavingsAccountDto>> AddSecondarySavingsAccount(CreateSecundarySavingsAccountsDto dto);
-        Task<ResultDto<SavingsAccountDetailDto>> GetSavingsAccountDetail(int accountId);
-        Task<ResultDto<SavingsAccountDto>> CancelSecondarySavingsAccount(int accountId);
+        Task<ResultDto<SavingsAccountDetailDto>> GetSavingsAccountDetail(string accountId);
+        Task<ResultDto<SavingsAccountDto>> CancelSecondarySavingsAccount(string accountId);
     }
 }
 

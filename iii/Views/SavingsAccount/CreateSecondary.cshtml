@@ -1,0 +1,58 @@
+﻿@using ArtemisBanking.Core.Application.ViewModels.SavingsAccount
+@model CreateSecundarySavingsAccountsViewModel
+
+@{
+    ViewData["Title"] = "Crear Cuenta de Ahorro Secundaria";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4 col-md-6">
+    <h3 class="mb-3">Crear Cuenta de Ahorro Secundaria</h3>
+
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        <strong>Cliente seleccionado:</strong> ID @Model.UserId
+    </div>
+
+    <form asp-action="Create" method="post" class="shadow-sm p-4 bg-light rounded">
+        <input type="hidden" asp-for="UserId" /> <input type="hidden" asp-for="AdminUserId" />
+
+        <div class="form-group mb-3">
+            <label class="fw-bold">Balance Inicial</label>
+            <div class="input-group"> <span class="input-group-text">RD$</span>
+                <input asp-for="InitialBalance"type="number" step="0.01" min="0"class="form-control"laceholder="Ej: 5000.00" />
+            </div>
+            <span asp-validation-for="InitialBalance" class="text-danger"></span>
+            <small class="text-muted d-block mt-1">
+                El balance inicial puede ser 0. Esta cantidad se depositará en la cuenta al momento de crearla.
+            </small>
+        </div>
+
+        <div class="card mb-3 bg-light border">
+            <div class="card-body">
+                <h6 class="card-title mb-2">
+                    <i class="bi bi-gear"></i> Información Automática
+                </h6>
+                <ul class="mb-0 small">
+                    <li>Se generará un número de cuenta único de 9 dígitos.</li>
+                    <li>La cuenta se marcará como "Secundaria".</li>
+                    <li>La cuenta se creará en estado activo.</li>
+                    <li>Se registrará el administrador responsable.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-check-circle"></i> Crear Cuenta Secundaria
+            </button>
+            <a asp-action="SelectClient" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Volver a Selección
+            </a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

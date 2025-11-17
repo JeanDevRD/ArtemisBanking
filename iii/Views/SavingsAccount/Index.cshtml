@@ -1,0 +1,146 @@
+﻿@using ArtemisBanking.Core.Application.ViewModels.SavingsAccount
+@model HomeSavingsAccountViewModel
+
+@{
+    ViewData["Title"] = "Gestión de Cuentas de Ahorro";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">Gestión de Cuentas de Ahorro</h3>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <form method="get" class="row g-3 mb-4 shadow-sm p-3 bg-light rounded">
+        <div class="col-md-3">
+            <label class="form-label">Buscar por cédula</label>
+            <input type="text" name="identificationNumber" class="form-control" 
+            value="@Model.FilterIdentificationNumber" placeholder="000-0000000-0" />
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Estado</label>
+            <select name="isActive" class="form-select">
+                <option value="">Todas</option>
+                <option value="true" selected="@(Model.IsActive == true)">Activas</option>
+                <option value="false" selected="@(Model.IsActive == false)">Canceladas</option>
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <label class="form-label">Tipo</label>
+            <select name="accountType" class="form-select">
+                <option value="">Todas</option>
+                <option value="1" selected="@(Model.AccountType == 1)">Principal</option>
+                <option value="2" selected="@(Model.AccountType == 2)">Secundaria</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Filtrar </button>
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+            <a asp-action="SelectClient" class="btn btn-success w-100"><i class="bi bi-plus-circle"></i> Asignar Cuenta </a>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover shadow-sm">
+            <thead class="table-dark">
+                <tr>
+                    <th>Número de Cuenta</th>
+                    <th>Titular</th>
+                    <th>Balance</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Accounts != null && Model.Accounts.Any())
+                {
+                    foreach (var account in Model.Accounts)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@account.AccountNumber</strong>
+                                @if (account.IsPrincipal)
+                                {
+                                    <span class="badge bg-primary ms-2">Principal</span>
+                                }
+                            </td>
+                            <td>@account.UserFullName</td>
+                            <td>
+                                <strong class="text-success">@account.Balance.ToString("C2")</strong>
+                            </td>
+                            <td>
+                                <span class="badge bg-@(account.IsPrincipal ? "primary" : "secondary")">
+                                    @account.AccountType
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-@(account.IsActive ? "success" : "danger")">
+                                    @(account.IsActive ? "Activa" : "Cancelada")
+                                </span>
+                            </td>
+                            <td>
+                                <a asp-action="Detail" asp-route-accountId="@account.AccountId"
+                                   class="btn btn-sm btn-info"> <i class="bi bi-eye"></i> Ver Detalles
+                                </a>
+
+                                @if (!account.IsPrincipal && account.IsActive)
+                                {
+                                    <a asp-action="Cancel" asp-route-accountId="@account.AccountId"
+                                       class="btn btn-sm btn-danger"> <i class="bi bi-x-circle"></i> Cancelar
+                                    </a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">
+                            No se encontraron cuentas de ahorro con los filtros aplicados.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-center mt-4">
+            <nav>
+                <ul class="pagination">
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                            <a class="page-link" asp-action="Index" asp-route-pageNumber="@i"
+                            asp-route-identificationNumber="@Model.FilterIdentificationNumber"asp-route-isActive="@Model.IsActive"
+                               asp-route-accountType="@Model.AccountType"> @i
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </div>
+    }
+</div>

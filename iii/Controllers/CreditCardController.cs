@@ -3,6 +3,7 @@ using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Application.ViewModel.CreditCard;
 using ArtemisBanking.Core.Application.ViewModel.Loan;
 using ArtemisBanking.Core.Application.ViewModels.CreditCard;
+using ArtemisBanking.Core.Application.ViewModels.SavingsAccount;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
