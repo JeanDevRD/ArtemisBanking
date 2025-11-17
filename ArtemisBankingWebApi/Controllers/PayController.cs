@@ -70,7 +70,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
                     return NoContent();
                 }
 
-                var accountDetail = await _savingsAccountService.GetSavingsAccountDetail(commerceAccount.Id);
+                var accountDetail = await _savingsAccountService.GetSavingsAccountDetail(commerceAccount.AccountNumber);
 
                 if (accountDetail.IsError || accountDetail.Result?.Transactions == null || !accountDetail.Result.Transactions.Any())
                 {
