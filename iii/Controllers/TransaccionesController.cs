@@ -78,9 +78,9 @@ namespace ArtemisBankingWebApp.Controllers
 
             if (!string.IsNullOrEmpty(reference))
                 query = query.Where(t => t.Id.ToString().Contains(reference) ||
-                                       t.Source.Contains(reference) ||
-                                       t.Beneficiary.Contains(reference) ||
-                                       t.Amount.ToString("F2").Contains(reference));
+                                                       t.Source.Contains(reference) ||
+                                                       t.Beneficiary.Contains(reference) ||
+                                                       t.Amount.ToString("F2").Contains(reference));
 
             var result = query
                 .Where(t => t.SavingsAccount != null && t.SavingsAccount.UserId == userId) // 
@@ -94,7 +94,8 @@ namespace ArtemisBankingWebApp.Controllers
             ViewBag.Reference = reference;
             ViewBag.Products = myProducts;
 
-            return View(result);
+            // Use existing Spanish view folder: Views/Transacciones/Index.cshtml
+            return View("~/Views/Transacciones/Index.cshtml", result);
         }
 
         [HttpPost]

@@ -37,7 +37,7 @@ namespace ArtemisBankingWebApp.Controllers
                 if (User.IsInRole("Cliente"))
                     return RedirectToAction("Index", "Home");
                 if (User.IsInRole("Teller"))
-                    return RedirectToAction("Index", "Cajero");
+                    return RedirectToAction("Index", "CasherDashboard");
                 if (User.IsInRole("Merchant"))
                     return RedirectToAction("Index", "Merchant");
             }

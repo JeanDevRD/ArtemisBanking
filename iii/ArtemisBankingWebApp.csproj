@@ -27,4 +27,8 @@
     <ProjectReference Include="..\ArtemisBanking.Infraestructure.Shared\ArtemisBanking.Infraestructure.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Client\" />
+  </ItemGroup>
+
 </Project>

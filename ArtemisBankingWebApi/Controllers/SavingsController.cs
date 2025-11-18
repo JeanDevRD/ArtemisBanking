@@ -17,7 +17,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
             _savingsAccountService = savingsAccountService;
         }
 
-      
+        
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SavingsAccountsHomeDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -81,7 +81,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
                     return NotFound(new { message = "Cuenta no encontrada" });
                 }
 
-                var result = await _savingsAccountService.GetSavingsAccountDetail(account.Id);
+                var result = await _savingsAccountService.GetSavingsAccountDetail(account.AccountNumber);
 
                 if (result.IsError || result.Result == null)
                 {
@@ -140,7 +140,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> CancelSecondarySavingsAccount(int id)
+        public async Task<IActionResult> CancelSecondarySavingsAccount(string id)
         {
             try
             {

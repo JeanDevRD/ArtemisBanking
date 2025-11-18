@@ -1,6 +1,8 @@
-﻿@model HomeCasherViewModel
+﻿@using ArtemisBanking.Core.Application.ViewModels.Transaction
+@model HomeCasherViewModel
 @{
     ViewData["Title"] = "Home Cajero";
+    Layout = "_LayoutTeller";
 }
 
 <div class="container mt-4">
@@ -11,7 +13,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Transacciones totales</h5>
-                    <h2 class="text-primary">@Model.TotalTransaction.TotalCountTransaction</h2>
+                    <h2 class="text-primary">@Model?.TotalTransaction?.TotalCountTransaction 0</h2>
                 </div>
             </div>
         </div>
@@ -19,7 +21,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Depósitos</h5>
-                    <h2 class="text-success">@Model.TotalDeposit.TotalCountDeposit</h2>
+                    <h2 class="text-success">@Model?.TotalDeposit?.TotalCountDeposit 0</h2>
                 </div>
             </div>
         </div>
@@ -27,7 +29,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Retiros</h5>
-                    <h2 class="text-danger">@Model.TotalWithdrawal.TotalCountWithdrawal</h2>
+                    <h2 class="text-danger">@Model?.TotalWithdrawal?.TotalCountWithdrawal 0</h2>
                 </div>
             </div>
         </div>
@@ -35,7 +37,7 @@
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h5 class="card-title">Pagos</h5>
-                    <h2 class="text-warning">@Model.TotalPaids.TotalCountPaids</h2>
+                    <h2 class="text-warning">@Model?.TotalPaids?.TotalCountPaids 0</h2>
                 </div>
             </div>
         </div>

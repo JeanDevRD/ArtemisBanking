@@ -70,15 +70,17 @@ namespace ArtemisBankingWebApi.Controllers.v1
                     return NoContent();
                 }
 
-                var accountDetail = await _savingsAccountService.GetSavingsAccountDetail(commerceAccount.Id);
+                var accountDetail = await _savingsAccountService.GetSavingsAccountDetail(commerceAccount.AccountNumber);
 
                 if (accountDetail.IsError || accountDetail.Result?.Transactions == null || !accountDetail.Result.Transactions.Any())
                 {
                     return NoContent();
                 }
 
-                var transactions = accountDetail.Result.Transactions.Where(t => t.TransactionType == "CRÉDITO")
-                    .OrderByDescending(t => t.TransactionDate).ToList();
+                var transactions = accountDetail.Result.Transactions
+                    .Where(t => t.TransactionType == "CRÉDITO")
+                    .OrderByDescending(t => t.TransactionDate)
+                    .ToList();
 
                 var totalCount = transactions.Count;
                 var paginatedTransactions = transactions.Skip((page - 1) * pageSize).Take(pageSize).ToList();

@@ -6,12 +6,12 @@ using System.Security.Claims;
 namespace ArtemisBankingWebApp.Controllers
 {
     [Authorize(Roles = "cliente")]
-    public class LoansController : Controller
+    public class PrestamosController : Controller
     {
         private readonly ILoanService _loanService;
         private readonly ITransactionService _transactionService;
 
-        public LoansController(
+        public PrestamosController(
             ILoanService loanService,
             ITransactionService transactionService)
         {
@@ -25,11 +25,11 @@ namespace ArtemisBankingWebApp.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var loan = await _loanService.GetByIdAsync(id);
 
-            // Verificar que el préstamo pertenece al usuario autenticado
             if (loan == null || loan.UserId != userId)
                 return RedirectToAction("Index", "Home");
 
-            return View(loan);
+            // Thin adapter: redirect to canonical Loan controller
+            return RedirectToAction("Detail", "Loan", new { loanId = id });
         }
 
         [HttpGet]
@@ -38,25 +38,11 @@ namespace ArtemisBankingWebApp.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var loan = await _loanService.GetByIdAsync(id);
 
-            // Verificar pertenencia
             if (loan == null || loan.UserId != userId)
                 return RedirectToAction("Index", "Home");
 
-            // Obtener cuota pendiente
-            var pendingInstallment = loan.Installments?
-                .FirstOrDefault(i => !i.IsPaid);
-
-            if (pendingInstallment == null)
-            {
-                TempData["Info"] = "No hay cuotas pendientes de pago.";
-                return RedirectToAction("Detail", new { id });
-            }
-
-            ViewBag.LoanId = id;
-            ViewBag.InstallmentAmount = pendingInstallment.PaymentAmount;
-            ViewBag.DueDate = pendingInstallment.DueDate;
-
-            return View(loan);
+            // Thin adapter: redirect to canonical Loan controller with payment flag
+            return RedirectToAction("Detail", "Loan", new { loanId = id, payInstallment = true });
         }
     }
 }

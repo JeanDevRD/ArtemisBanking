@@ -1,0 +1,206 @@
+@model IPagedList<ArtemisBanking.Core.Application.Dtos.Transaction.TransactionDto>
+@using ArtemisBanking.Core.Domain.Common.Enum
+@{
+    ViewData["Title"] = "Historial de Transacciones";
+}
+
+<div class="container mt-4">
+    <h3 class="mb-4">Historial de Transacciones</h3>
+
+    <!-- FILTROS -->
+    <form method="get" class="row g-3 mb-4 shadow-sm p-3 bg-light rounded">
+        <div class="col-md-2">
+            <label class="form-label">Tipo</label>
+            <select name="type" class="form-control form-select">
+                <option value="">Todos</option>
+                <option value="1" selected="@(ViewBag.Type == 1)">Depósito</option>
+                <option value="2" selected="@(ViewBag.Type == 2)">Retiro</option>
+                <option value="3" selected="@(ViewBag.Type == 3)">Transferencia</option>
+                <option value="4" selected="@(ViewBag.Type == 4)">Pago Préstamo</option>
+                <option value="5" selected="@(ViewBag.Type == 5)">Pago Tarjeta</option>
+                <option value="6" selected="@(ViewBag.Type == 6)">Avance de Efectivo</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Desde</label>
+            <input type="date" name="from" class="form-control" value="@ViewBag.From" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Hasta</label>
+            <input type="date" name="to" class="form-control" value="@ViewBag.To" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Producto</label>
+            <select name="productId" class="form-control form-select">
+                <option value="">Todos</option>
+                @foreach (var p in ViewBag.Products)
+                {
+                    <option value="@p.Id" selected="@(ViewBag.ProductId == p.Id)">@p.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Búsqueda</label>
+            <input type="text" name="reference" class="form-control" placeholder="ID, origen, monto..." value="@ViewBag.Reference" />
+        </div>
+        <div class="col-md-1 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </div>
+    </form>
+
+    <!-- EXPORTAR -->
+    <form method="post" class="mb-4 d-flex gap-2">
+        <input type="hidden" name="type" value="@ViewBag.Type" />
+        <input type="hidden" name="from" value="@ViewBag.From" />
+        <input type="hidden" name="to" value="@ViewBag.To" />
+        <input type="hidden" name="productId" value="@ViewBag.ProductId" />
+        <input type="hidden" name="reference" value="@ViewBag.Reference" />
+        <button formaction="ExportPdf" class="btn btn-danger">
+            PDF
+        </button>
+        <button formaction="ExportExcel" class="btn btn-success">
+            Excel
+        </button>
+    </form>
+
+    <!-- TABLA DE TRANSACCIONES -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover shadow-sm align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha</th>
+                    <th>Tipo</th>
+                    <th>Origen</th>
+                    <th>Destino</th>
+                    <th>Monto</th>
+                    <th>Estado</th>
+                    <th>Referencia</th>
+                    <th>Detalle</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Any())
+                {
+                    @foreach (var t in Model)
+                    {
+                        <tr>
+                            <td>@t.Date.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <span class="badge bg-info text-dark">
+                                    @((TypeTransaction)t.Type)
+                                </span>
+                            </td>
+                            <td>@t.Source</td>
+                            <td>@t.Beneficiary</td>
+                            <td class="text-end fw-bold">@t.Amount.ToString("C2")</td>
+                            <td>
+                                <span class="badge bg-@(t.Status == 1 ? "success" : t.Status == 2 ? "warning" : "danger")">
+                                    @((StatusTransaction)t.Status)
+                                </span>
+                            </td>
+                            <td><code>#@t.Id</code></td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal-@t.Id">
+                                    Ver
+                                </button>
+                            </td>
+                        </tr>
+
+                        <!-- MODAL DETALLE -->
+                        <div class="modal fade" id="modal-@t.Id" tabindex="-1" aria-labelledby="modalLabel-@t.Id" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-primary text-white">
+                                        <h5 class="modal-title" id="modalLabel-@t.Id">
+                                            Detalle Transacción #@t.Id
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <p><strong>Fecha:</strong> @t.Date.ToString("dd/MM/yyyy HH:mm")</p>
+                                                <p><strong>Tipo:</strong> @((TypeTransaction)t.Type)</p>
+                                                <p><strong>Monto:</strong> <span class="fw-bold">@t.Amount.ToString("C2")</span></p>
+                                                <p>
+                                                    <strong>Estado:</strong>
+                                                    <span class="badge bg-@(t.Status == 1 ? "success" : t.Status == 2 ? "warning" : "danger")">
+                                                        @((StatusTransaction)t.Status)
+                                                    </span>
+                                                </p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <p><strong>Origen:</strong> @t.Source</p>
+                                                <p><strong>Destino:</strong> @t.Beneficiary</p>
+                                                <p><strong>Código:</strong> <code>#@t.Id</code></p>
+                                                <p>
+                                                    <strong>Comprobante:</strong>
+                                                    @if (!string.IsNullOrEmpty(t.ComprobanteUrl))
+                                                    {
+                                                        <a href="@t.ComprobanteUrl" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                                            Descargar
+                                                        </a>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-muted">No disponible</span>
+                                                    }
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            No se encontraron transacciones con los filtros aplicados.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- PAGINACIÓN -->
+    <div class="d-flex justify-content-center mt-4">
+        @Html.PagedListPager(Model, page => Url.Action("Index", new
+        {
+            type = ViewBag.Type,
+                from = ViewBag.From,
+                to = ViewBag.To,
+                productId = ViewBag.ProductId,
+                reference = ViewBag.Reference,
+                page
+                }),
+                new PagedListRenderOptions
+                {
+                    LiElementClasses = new[] { "page-item" },
+                    PageClasses = new[] { "page-link" },
+                    UlElementClasses = new[] { "pagination" },
+                    DisplayLinkToPreviousPage = PagedListDisplayMode.IfNeeded,
+                    DisplayLinkToNextPage = PagedListDisplayMode.IfNeeded,
+                    DisplayLinkToFirstPage = PagedListDisplayMode.Never,
+                    DisplayLinkToLastPage = PagedListDisplayMode.Never
+                })
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Mantener foco en búsqueda al filtrar
+        document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('reference')) {
+                document.querySelector('input[name="reference"]').focus();
+            }
+        });
+    </script>
+}

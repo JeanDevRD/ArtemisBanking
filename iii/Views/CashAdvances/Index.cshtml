@@ -1,0 +1,53 @@
+@model IEnumerable<ArtemisBanking.Core.Application.Dtos.CreditCard.CreditCardDto>
+@{
+    ViewData["Title"] = "Cash Advances";
+    Layout = "_LayoutClient";
+}
+
+<!-- English copy of Avances/Index.cshtml placed for CashAdvances controller -->
+<div class="container mt-4 col-md-6">
+    <h3>Cash Advance</h3>
+
+    <div class="alert alert-warning">
+        <strong>Information:</strong> A cash advance is a credit against your card's available limit. It includes interest and fees.
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <form method="post" class="bg-light p-4 rounded">
+                <div class="form-group mb-3">
+                    <label>Credit Card</label>
+                    <select name="cardId" class="form-control" required>
+                        <option value="">-- Select card --</option>
+                        @if (ViewBag.Cards != null)
+                        {
+                            @foreach (var t in ViewBag.Cards)
+                            {
+                                <option value="@t.Id">****@t.CardNumber.Substring(t.CardNumber.Length - 4) - Available: @(t.CreditLimit - t.CurrentDebt).ToString("C2")</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Requested Amount</label>
+                    <input type="number" name="amount" class="form-control" step="0.01" min="100" required placeholder="Minimum: 100.00" />
+                    <small class="form-text text-muted">Available Limit: @ViewBag.AvailableLimit?.ToString("C2")</small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label>Destination Account (to deposit cash)</label>
+                    <input type="text" class="form-control" disabled value="Cash will be deposited at branch" />
+                </div>
+
+                <div class="alert alert-info">
+                    <p class="mb-0"><strong>Fee:</strong> 3% of the amount</p>
+                    <p class="mb-0"><strong>Interest Rate:</strong> According to your card</p>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Request Advance</button>
+                <a asp-controller="Home" asp-action="Index" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>

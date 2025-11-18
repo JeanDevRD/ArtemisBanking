@@ -18,7 +18,6 @@ namespace ArtemisBankingWebApi.Controllers.v1
             _loanService = loanService;
         }
 
-     
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<LoanListDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -97,7 +96,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetLoanDetail(string id)
+        public async Task<IActionResult> GetLoanDetail(int id)
         {
             try
             {
@@ -167,7 +166,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UpdateInterestRate(string id, [FromBody] UpdateInterestRateDto dto)
+        public async Task<IActionResult> UpdateInterestRate(int id, [FromBody] UpdateInterestRateDto dto)
         {
             try
             {

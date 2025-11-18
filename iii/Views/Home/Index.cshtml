@@ -51,11 +51,33 @@
                     <td>@p.Amount.ToString("C2")</td>
                     <td><span class="badge bg-@(p.Status == "Active" || p.Status == "Active" ? "success" : "secondary")">@p.Status</span></td>
                     <td>
-                        <a asp-controller="@(p.TypeId == 1 ? "Accounts" : p.TypeId == 2 ? "Loans" : "Cards")"
-                           asp-action="Detail" asp-route-id="@p.Id" class="btn btn-sm btn-info">Ver</a>
-                        <a asp-controller="@(p.TypeId == 1 ? "Transfers" : "Payments")"
-                           asp-action="@(p.TypeId == 1 ? "Index" : p.TypeId == 2 ? "PayInstallment" : "PayCard")"
-                           asp-route-id="@p.Id" class="btn btn-sm btn-primary">Operar</a>
+                        @* Detail link: map to appropriate English controller and route parameter names *@
+                        @if (p.TypeId == 1)
+                        {
+                            <a asp-controller="SavingsAccount" asp-action="Detail" asp-route-accountId="@p.Number" class="btn btn-sm btn-info">Ver</a>
+                        }
+                        else if (p.TypeId == 2)
+                        {
+                            <a asp-controller="Loan" asp-action="Detail" asp-route-loanId="@p.Id" class="btn btn-sm btn-info">Ver</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="CreditCard" asp-action="Detail" asp-route-cardId="@p.Number" class="btn btn-sm btn-info">Ver</a>
+                        }
+
+                        @* Operate link: Savings -> Transfers, Loan -> Loan Detail, Card -> CreditCard Detail *@
+                        @if (p.TypeId == 1)
+                        {
+                            <a asp-controller="Transfers" asp-action="Index" asp-route-accountId="@p.Id" class="btn btn-sm btn-primary">Operar</a>
+                        }
+                        else if (p.TypeId == 2)
+                        {
+                            <a asp-controller="Loan" asp-action="Detail" asp-route-loanId="@p.Id" class="btn btn-sm btn-primary">Operar</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="CreditCard" asp-action="Detail" asp-route-cardId="@p.Number" class="btn btn-sm btn-primary">Operar</a>
+                        }
                     </td>
                 </tr>
             }
