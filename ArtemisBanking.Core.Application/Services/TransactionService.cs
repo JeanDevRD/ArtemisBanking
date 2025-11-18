@@ -51,9 +51,9 @@ namespace ArtemisBanking.Core.Application.Services
             try
             {
                 var account = await _savingsAccountRepository.GetAllQueryAsync().Where(x => x.AccountNumber == dto.AccountNumber).FirstOrDefaultAsync();
-                var client = await _accountServiceForApp.GetUserById(account!.AssignedByUserId!);
-                
-                if(client == null)
+                var client = await _accountServiceForApp.GetUserById(account!.UserId);
+
+                if (client == null)
                 {
                     result.IsError = true;
                     result.Message = "El usuario asignado a la cuenta no es válido";
@@ -98,7 +98,7 @@ namespace ArtemisBanking.Core.Application.Services
             try
             {
                 var account = await _savingsAccountRepository.GetAllQueryAsync().Where(x => x.AccountNumber == dto.AccountNumber).FirstOrDefaultAsync();
-                var client = await _accountServiceForApp.GetUserById(account!.AssignedByUserId!);
+                var client = await _accountServiceForApp.GetUserById(account!.UserId);
                 account!.Balance += dto.Amount;
                 await _savingsAccountRepository.UpdateAsync(account.Id, account);
 
@@ -149,7 +149,7 @@ namespace ArtemisBanking.Core.Application.Services
             try
             {
                 var account = await _savingsAccountRepository.GetAllQueryAsync().Where(x => x.AccountNumber == dto.AccountNumber).FirstOrDefaultAsync();
-                var client = await _accountServiceForApp.GetUserById(account!.AssignedByUserId!);
+                var client = await _accountServiceForApp.GetUserById(account!.UserId);
                 account!.Balance -= dto.Amount;
                 await _savingsAccountRepository.UpdateAsync(account.Id, account);
 
