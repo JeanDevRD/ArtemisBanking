@@ -2,12 +2,13 @@
 using ArtemisBanking.Core.Application.ViewModels.AdminDashboard;
 using ArtemisBanking.Core.Application.ViewModels.HomeAdmin;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 
 namespace ArtemisBankingWebApp.Controllers
 {
-
+    [Authorize(Roles = "Admin")]
     public class HomeAdminController : Controller
     {
         private readonly IAdminDashboardService _adminHomeService;

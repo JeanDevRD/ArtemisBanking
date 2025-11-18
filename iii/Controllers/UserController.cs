@@ -3,10 +3,12 @@ using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Application.ViewModels.User;
 using AutoMapper;
 using iText.Layout;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArtemisBankingWebApp.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class UserController : Controller
     {
         private readonly IAccountServiceForApp _serviceForApp;
@@ -83,6 +85,28 @@ namespace ArtemisBankingWebApp.Controllers
             var dto = _mapper.Map<SaveUserDto>(vm);
 
             var origin = $"{Request.Scheme}://{Request.Host}{Request.PathBase}";
+
+            var users = await _serviceForApp.GetAllUser();
+
+            var userNameExists = users.Any(u => u.UserName.Equals(vm.UserName, StringComparison.OrdinalIgnoreCase));
+            var identificationNumberExists = users.Any(u => u.IdentificationNumber.Equals(vm.IdentificationNumber, StringComparison.OrdinalIgnoreCase));
+
+            if (userNameExists)
+            {
+                ModelState.AddModelError(nameof(vm.UserName), "El nombre de usuario ya existe.");
+                return View("Create", vm);
+            }
+
+            if (identificationNumberExists)
+            {
+                ModelState.AddModelError(nameof(vm.IdentificationNumber), "El número de identificación ya existe.");
+                return View("Create", vm);
+            }
+
+            {
+                ModelState.AddModelError(nameof(vm.InitialAmount), "El monto inicial no puede ser negativo.");
+                return View("Create", vm);
+            }
 
             var result = await _serviceForApp.RegisterUser(dto, origin, isApi: false);
 

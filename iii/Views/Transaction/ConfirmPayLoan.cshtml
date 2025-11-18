@@ -1,0 +1,63 @@
+﻿@model ConfirmPayLoanViewModel
+@{
+    ViewData["Title"] = "Confirmar Pago a Préstamo";
+    Layout = "_LayoutAnonymous";
+}
+
+<div class="container mt-4">
+    <h2>Confirmar Pago a Préstamo</h2>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-cash-coin"></i> Detalles del Pago
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Titular del préstamo:</strong> @Model.LoanHolderName</p>
+                    <p><strong>Préstamo:</strong> @Model.LoanNumber</p>
+                    <p>
+                        <strong>Monto pendiente:</strong>
+                        <span class="text-danger">@Model.OutstandingAmount.ToString("C2")</span>
+                    </p>
+                </div>
+
+                <div class="col-md-6">
+                    <p><strong>Cuenta origen:</strong> @Model.AccountNumber</p>
+                    <p>
+                        <strong>Monto a pagar:</strong>
+                        <span class="text-success fw-bold">@Model.Amount.ToString("C2")</span>
+                    </p>
+                </div>
+            </div>
+
+            @if (Model.Amount > Model.OutstandingAmount)
+            {
+                <div class="alert alert-warning mt-3">
+                    <strong>Nota:</strong>
+                    El monto ingresado (@Model.Amount.ToString("C2"))
+                    es mayor que el monto pendiente (@Model.OutstandingAmount.ToString("C2")).
+                    Se pagará solo el monto adeudado.
+                </div>
+            }
+        </div>
+    </div>
+
+    <form asp-action="ConfirmPayLoan" method="post" class="mt-4">
+        <input type="hidden" asp-for="AccountNumber" />
+        <input type="hidden" asp-for="Amount" />
+        <input type="hidden" asp-for="LoanNumber" />
+        <input type="hidden" asp-for="LoanHolderName" />
+        <input type="hidden" asp-for="OutstandingAmount" />
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <button type="submit" class="btn btn-success btn-lg"> Confirmar Pago </button>
+            <button type="submit" asp-action="CancelOperation" asp-route-returnAction="PayLoan" class="btn btn-secondary btn-lg">
+                Cancelar
+            </button>
+        </div>
+    </form>
+</div>

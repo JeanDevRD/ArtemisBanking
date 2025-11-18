@@ -2,11 +2,13 @@
 using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Application.ViewModels.Transaction;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace ArtemisBankingWebApp.Controllers
 {
+    [Authorize(Roles = "Teller")]
     public class TransactionController : Controller
     {
         private readonly ITransactionService _transactionService;
@@ -20,7 +22,7 @@ namespace ArtemisBankingWebApp.Controllers
 
         public IActionResult Index()
         {
-            return RedirectToAction("Index", "CasherDashboard");
+            return View();
         }
 
         public IActionResult Deposit()
@@ -134,6 +136,55 @@ namespace ArtemisBankingWebApp.Controllers
             return RedirectToAction(returnAction, returnController);
         }
 
+        public IActionResult PayCreditCard()
+        {
+            return View("PayCreditCard", new PayCreditCardViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PayCreditCard(PayCreditCardViewModel vm)
+        {
+            if (!ModelState.IsValid)
+                return View("PayCreditCard", vm);
+
+            var validation = await _transactionService.ValidateCreditCardPaymentAsync(
+                vm.AccountNumber, vm.CardNumber, vm.Amount);
+
+            if (validation.IsError)
+            {
+                ModelState.AddModelError(string.Empty, validation.Message ?? "Error en validación");
+                return View("PayCreditCard", vm);
+            }
+
+
+            var confirmVm = new ConfirmPayCreditCardViewModel
+            {
+                AccountNumber = vm.AccountNumber,
+                Amount = vm.Amount,
+                CardNumber = vm.CardNumber,
+                CardHolderName = validation.Result!.HolderName,
+                LastFourDigits = vm.CardNumber.Substring(12)
+            };
+
+            return View("ConfirmPayCreditCard", confirmVm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmPayCreditCard(ConfirmPayCreditCardViewModel confirmVm)
+        {
+            var cashierId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+            var ok = await _transactionService.ConfirmCreditCardPaymentAsync(
+                confirmVm.AccountNumber, confirmVm.CardNumber, confirmVm.Amount, cashierId);
+
+            if (!ok)
+            {
+                TempData["Error"] = "Error al procesar el pago.";
+                return RedirectToAction("PayCreditCard");
+            }
+
+            TempData["Success"] = $"Pago de {confirmVm.Amount:C} realizado a ****{confirmVm.LastFourDigits}.";
+            return RedirectToAction("Index", "CasherDashboard");
+        }
 
         private static string MaskAccount(string accountNumber)
         {
@@ -142,5 +193,118 @@ namespace ArtemisBankingWebApp.Controllers
             var last4 = accountNumber[^4..];
             return $"xxx-xxx-{last4}";
         }
+
+        public async Task<IActionResult> PayLoan()
+        {
+            return View("PayLoan", new PayLoanViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PayLoan(PayLoanViewModel vm)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("PayLoan", vm);
+            }
+
+            var validation = await _transactionService.ValidateLoanPaymentAsync(
+                vm.AccountNumber, vm.LoanNumber, vm.Amount);
+
+            if (validation.IsError || validation.Result == null)
+            {
+                ModelState.AddModelError(string.Empty,
+                    validation.Message ?? "Error en la validación del pago");
+                return View("PayLoan", vm);
+            }
+
+            var confirmVm = new ConfirmPayLoanViewModel
+            {
+                AccountNumber = validation.Result.AccountNumber,
+                Amount = validation.Result.Amount,
+                LoanNumber = vm.LoanNumber,
+                LoanHolderName = validation.Result.HolderName,
+                OutstandingAmount = validation.Result.OutstandingAmount
+            };
+
+            return View("ConfirmPayLoan", confirmVm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmPayLoan(ConfirmPayLoanViewModel confirmVm)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("ConfirmPayLoan", confirmVm);
+            }
+
+            var cashierId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+            var ok = await _transactionService.ConfirmLoanPaymentAsync(
+                confirmVm.AccountNumber, confirmVm.LoanNumber, confirmVm.Amount, cashierId);
+
+            if (!ok)
+            {
+                TempData["Error"] = "No se pudo procesar el pago al préstamo.";
+                return RedirectToAction("PayLoan");
+            }
+
+            TempData["Success"] = $"Pago realizado al préstamo {confirmVm.LoanNumber} por {confirmVm.Amount:C}.";
+            return RedirectToAction("Index", "CasherDashboard");
+        }
+
+        public IActionResult ThirdPartyTransaction()
+        {
+            return View("ThirdPartyTransaction", new ThirdPartyTransactionViewModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ThirdPartyTransaction(ThirdPartyTransactionViewModel vm)
+        {
+            if (!ModelState.IsValid)
+                return View("ThirdPartyTransaction", vm);
+
+            var validation = await _transactionService.ValidateThirdPartyTransactionAsync(
+                vm.AccountOrigin, vm.AccountDestination, vm.Amount);
+
+            if (validation.IsError || validation.Result == null)
+            {
+                ModelState.AddModelError(string.Empty,
+                    validation.Message ?? "Error en la validación de la transacción");
+                return View("ThirdPartyTransaction", vm);
+            }
+
+            var confirmVm = new ConfirmThirdPartyTransactionViewModel
+            {
+                AccountOrigin = vm.AccountOrigin,
+                AccountDestination = vm.AccountDestination,
+                Amount = vm.Amount,
+                DestinationHolderName = validation.Result.HolderName
+            };
+
+            return View("ConfirmThirdPartyTransaction", confirmVm);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmThirdPartyTransaction(ConfirmThirdPartyTransactionViewModel confirmVm)
+        {
+            if (!ModelState.IsValid)
+                return View("ConfirmThirdPartyTransaction", confirmVm);
+
+            var cashierId = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? string.Empty;
+
+            var ok = await _transactionService.ConfirmThirdPartyTransactionAsync(
+                confirmVm.AccountOrigin, confirmVm.AccountDestination, confirmVm.Amount, cashierId);
+
+            if (!ok)
+            {
+                TempData["Error"] = "No se pudo procesar la transacción.";
+                return RedirectToAction("ThirdPartyTransaction");
+            }
+
+            var lastFourDest = confirmVm.AccountDestination[^4..];
+            TempData["Success"] = $"Transacción realizada a la cuenta ****{lastFourDest} por {confirmVm.Amount:C}.";
+            return RedirectToAction("Index", "CasherDashboard");
+        }
+
     }
 }

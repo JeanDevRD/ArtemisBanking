@@ -1,0 +1,49 @@
+﻿@model ConfirmThirdPartyTransactionViewModel
+@{
+    ViewData["Title"] = "Confirmar Transacción";
+    Layout = "_LayoutAnonymous";
+}
+
+<div class="container mt-4">
+    <h2>Confirmar Transacción a Terceros</h2>
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">
+                <i class="bi bi-arrow-left-right"></i> Detalles de la Transacción
+            </h5>
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Cuenta origen:</strong> @Model.AccountOrigin</p>
+                    <p><strong>Cuenta destino:</strong> @Model.AccountDestination</p>
+                </div>
+
+                <div class="col-md-6">
+                    <p><strong>Beneficiario:</strong> @Model.DestinationHolderName</p>
+                    <p>
+                        <strong>Monto:</strong>
+                        <span class="text-success fw-bold">
+                            @Model.Amount.ToString("C2")
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <form asp-action="ConfirmThirdPartyTransaction" method="post" class="mt-4">
+        <input type="hidden" asp-for="AccountOrigin" />
+        <input type="hidden" asp-for="AccountDestination" />
+        <input type="hidden" asp-for="Amount" />
+        <input type="hidden" asp-for="DestinationHolderName" />
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+            <button type="submit" class="btn btn-success btn-lg"> Confirmar Transacción</button>
+            <button type="submit" asp-action="CancelOperation" asp-route-returnAction="ThirdPartyTransaction"
+                    class="btn btn-secondary btn-lg"> Cancelar
+            </button>
+        </div>
+    </form>
+</div>

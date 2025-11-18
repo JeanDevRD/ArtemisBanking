@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using ArtemisBanking.Core.Application.Dtos.Transaction;
+﻿using ArtemisBanking.Core.Application.Dtos.Transaction;
 
 namespace ArtemisBanking.Core.Application.ViewModels.Transacciones
 {

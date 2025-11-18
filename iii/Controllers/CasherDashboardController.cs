@@ -1,11 +1,13 @@
 ﻿using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Application.ViewModels.Transaction;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace ArtemisBankingWebApp.Controllers
 {
+    [Authorize(Roles = "Teller")]
     public class CasherDashboardController : Controller
     {
         private readonly ICasherDashboardService _casherService;
@@ -15,10 +17,11 @@ namespace ArtemisBankingWebApp.Controllers
         {
             _casherService = casherService;
             _mapper = mapper;
-        }
+        } 
 
         public async Task<IActionResult> Index()
         {
+
             var cashierId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var totalTransactions = await _casherService.CountTransactionsByCasherLog(cashierId);

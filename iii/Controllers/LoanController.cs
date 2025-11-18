@@ -5,11 +5,13 @@ using ArtemisBanking.Core.Application.ViewM.Loan;
 using ArtemisBanking.Core.Application.ViewModel.Loan;
 using ArtemisBanking.Core.Application.ViewModels.Loan;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using X.PagedList;
 
 namespace ArtemisBankingWebApp.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class LoanController : Controller
     {
         private readonly ILoanService _loanService;

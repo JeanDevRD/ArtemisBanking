@@ -20,7 +20,7 @@ namespace ArtemisBanking.Core.Application.Services
             var result = new ResultDto<CountTransactionDto>();
             try
             {
-                var count = await _transactionRepository.GetAllQueryAsync().Where(t => t.CashierId == IdCasher && t.Date == DateTime.Today).CountAsync();
+                var count = await _transactionRepository.GetAllQueryAsync().Where(t => t.CashierId == IdCasher && t.Date.Date == DateTime.Today).CountAsync();
 
                 if (count == 0)
                 {
@@ -47,7 +47,7 @@ namespace ArtemisBanking.Core.Application.Services
             var result = new ResultDto<CountDepositDto>();
             try
             {
-                var count = await _transactionRepository.GetAllQueryAsync().Where(t => t.CashierId == IdCasher && t.TypeTransaction == (int)TypeTransaction.Deposit && t.Date == DateTime.Today).CountAsync();
+                var count = await _transactionRepository.GetAllQueryAsync().Where(t => t.CashierId == IdCasher && t.TypeTransaction == (int)TypeTransaction.Deposit && t.Date.Date == DateTime.Today).CountAsync();
 
                 if (count == 0)
                 {
@@ -100,8 +100,13 @@ namespace ArtemisBanking.Core.Application.Services
         {
             var result = new ResultDto<CountPaidsDto>();
             try
+            
             {
-                var count = await _transactionRepository.GetAllQueryAsync().Where(t => t.CashierId == IdCasher && (t.TypeTransaction == (int)TypeTransaction.LoanPaid || t.TypeTransaction == (int)TypeTransaction.CreditCardPaid) && t.Date == DateTime.Today).CountAsync();
+                var transctions = await _transactionRepository.GetAllListAsync();
+
+                var paids = transctions.Where(t => t.CashierId == IdCasher && (t.TypeTransaction == (int)TypeTransaction.LoanPaid || t.TypeTransaction == (int)TypeTransaction.CreditCardPaid) && t.Date.Date == DateTime.Today);
+
+                var count = paids.Count();
 
                 if (count == 0)
                 {

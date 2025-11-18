@@ -3,10 +3,12 @@ using ArtemisBanking.Core.Application.Interfaces;
 using ArtemisBanking.Core.Application.ViewModel.Loan;
 using ArtemisBanking.Core.Application.ViewModels.SavingsAccount;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ArtemisBankingWebApp.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class SavingsAccountController : Controller
     {
         private readonly ISavingsAccountService _savingsService;

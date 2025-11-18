@@ -72,10 +72,7 @@ namespace ArtemisBankingWebApp.Controllers
                 return RedirectToAction("Index", "Home");
 
             if (roles.Contains("Teller"))
-                return RedirectToAction("Index", "Teller");
-
-            if (roles.Contains("Merchant"))
-                return RedirectToAction("Index", "Merchant");
+                return RedirectToAction("Index", "CasherDashboard");
 
             await _signInManager.SignOutAsync();
             return RedirectToAction("AccessDenied");
