@@ -20,43 +20,29 @@ namespace ArtemisBankingWebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Detalle(int id)
+        public async Task<IActionResult> Detail(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var prestamo = await _loanService.GetByIdAsync(id);
+            var loan = await _loanService.GetByIdAsync(id);
 
-            // Verificar que el préstamo pertenece al usuario autenticado
-            if (prestamo == null || prestamo.UserId != userId)
+            if (loan == null || loan.UserId != userId)
                 return RedirectToAction("Index", "Home");
 
-            return View(prestamo);
+            // Thin adapter: redirect to canonical Loan controller
+            return RedirectToAction("Detail", "Loan", new { loanId = id });
         }
 
         [HttpGet]
-        public async Task<IActionResult> PagarCuota(int id)
+        public async Task<IActionResult> PayInstallment(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var prestamo = await _loanService.GetByIdAsync(id);
+            var loan = await _loanService.GetByIdAsync(id);
 
-            // Verificar pertenencia
-            if (prestamo == null || prestamo.UserId != userId)
+            if (loan == null || loan.UserId != userId)
                 return RedirectToAction("Index", "Home");
 
-            // Obtener cuota pendiente
-            var cuotaPendiente = prestamo.Installments?
-                .FirstOrDefault(i => !i.IsPaid);
-
-            if (cuotaPendiente == null)
-            {
-                TempData["Info"] = "No hay cuotas pendientes de pago.";
-                return RedirectToAction("Detalle", new { id });
-            }
-
-            ViewBag.PrestamoId = id;
-            ViewBag.MontoCuota = cuotaPendiente.PaymentAmount;
-            ViewBag.FechaVencimiento = cuotaPendiente.DueDate;
-
-            return View(prestamo);
+            // Thin adapter: redirect to canonical Loan controller with payment flag
+            return RedirectToAction("Detail", "Loan", new { loanId = id, payInstallment = true });
         }
     }
 }

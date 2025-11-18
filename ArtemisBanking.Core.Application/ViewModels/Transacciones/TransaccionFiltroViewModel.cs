@@ -2,14 +2,14 @@
 
 namespace ArtemisBanking.Core.Application.ViewModels.Transacciones
 {
-    public class TransaccionFiltroViewModel
+    public class TransactionFilterViewModel
     {
-        public List<TransactionDto> Transacciones { get; set; } = new();
-        public string? Tipo { get; set; } // Depósito, retiro, transferencia, etc.
-        public string? Producto { get; set; } // Cuenta, préstamo, tarjeta
-        public DateTime? FechaDesde { get; set; }
-        public DateTime? FechaHasta { get; set; }
-        public string? Buscar { get; set; } // Referencia, monto o descripción
+        public List<TransactionDto> Transactions { get; set; } = new();
+        public string? Type { get; set; } // Deposit, withdrawal, transfer, etc.
+        public string? Product { get; set; } // Account, loan, card
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
+        public string? Search { get; set; } // Reference, amount or description
     }
 }
 

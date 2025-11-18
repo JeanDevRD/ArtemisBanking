@@ -6,16 +6,16 @@ using System.Collections.Generic;
 
 namespace ArtemisBanking.Core.Application.ViewModels.Cliente
 {
-    public class ClienteHomeViewModel
+    public class ClientHomeViewModel
     {
-        public List<SavingsAccountDto> Cuentas { get; set; } = new();
-        public List<LoanDto> Prestamos { get; set; } = new();
-        public List<CreditCardDto> Tarjetas { get; set; } = new();
-        public List<TransactionDto> UltimasTransacciones { get; set; } = new();
+        public List<SavingsAccountDto> Accounts { get; set; } = new();
+        public List<LoanDto> Loans { get; set; } = new();
+        public List<CreditCardDto> Cards { get; set; } = new();
+        public List<TransactionDto> LastTransactions { get; set; } = new();
 
-        public decimal SaldoTotal { get; set; }
-        public decimal DeudaTotal { get; set; }
-        public decimal ProximoPagoMinimo { get; set; }
-        public decimal ProximasCuotas { get; set; }
+        public decimal TotalBalance { get; set; }
+        public decimal TotalDebt { get; set; }
+        public decimal MinimumPayment { get; set; }
+        public decimal NextInstallments { get; set; }
     }
 }

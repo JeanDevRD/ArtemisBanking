@@ -11,14 +11,14 @@ using System.Security.Claims;
 namespace ArtemisBankingWebApp.Controllers
 {
     [Authorize(Roles = "cliente")]
-    public class ClienteController : Controller
+    public class ClientController : Controller
     {
         private readonly ISavingsAccountService _savingsService;
         private readonly ILoanService _loanService;
         private readonly ICreditCardService _cardService;
         private readonly ITransactionService _transactionService;
 
-        public ClienteController(
+        public ClientController(
             ISavingsAccountService savingsService,
             ILoanService loanService,
             ICreditCardService cardService,
@@ -36,32 +36,32 @@ namespace ArtemisBankingWebApp.Controllers
             if (string.IsNullOrEmpty(userId))
                 return RedirectToAction("Login", "Auth");
 
-            var cuentas = await _savingsService.GetAllAsync();
-            var prestamos = await _loanService.GetAllAsync();
-            var tarjetas = await _cardService.GetAllAsync();
-            var transacciones = await _transactionService.GetAllAsync();
+            var accounts = await _savingsService.GetAllAsync();
+            var loans = await _loanService.GetAllAsync();
+            var cards = await _cardService.GetAllAsync();
+            var transactions = await _transactionService.GetAllAsync();
 
             // Filtrar por usuario
-            var misCuentas = cuentas.Where(c => c.UserId == userId).ToList();
-            var misPrestamos = prestamos.Where(p => p.UserId == userId).ToList();
-            var misTarjetas = tarjetas.Where(t => t.UserId == userId).ToList();
+            var myAccounts = accounts.Where(c => c.UserId == userId).ToList();
+            var myLoans = loans.Where(p => p.UserId == userId).ToList();
+            var myCards = cards.Where(t => t.UserId == userId).ToList();
 
-            var ultimas5 = transacciones
+            var last5 = transactions
                 .Where(t => t.SavingsAccount != null && t.SavingsAccount.UserId == userId)
                 .OrderByDescending(t => t.Date)
                 .Take(5)
                 .ToList();
 
-            decimal saldoTotal = misCuentas.Sum(c => c.Balance);
-            decimal deudaTarjetas = misTarjetas.Sum(t => t.CurrentDebt);
-            decimal deudaPrestamos = misPrestamos.Sum(p => p.Amount);
-            decimal deudaTotal = deudaTarjetas + deudaPrestamos;
+            decimal totalBalance = myAccounts.Sum(c => c.Balance);
+            decimal cardDebt = myCards.Sum(t => t.CurrentDebt);
+            decimal loanDebt = myLoans.Sum(p => p.Amount);
+            decimal totalDebt = cardDebt + loanDebt;
 
-            decimal proximoPagoMinimo = misTarjetas
+            decimal minimumPayment = myCards
                 .Where(t => t.CurrentDebt > 0)
                 .Sum(t => t.CurrentDebt * 0.05m);
 
-            decimal proximasCuotas = misPrestamos
+            decimal nextLoanPayment = myLoans
                 .Where(p => p.Installments != null && p.Installments.Any(i => !i.IsPaid))
                 .SelectMany(p => p.Installments!)
                 .Where(i => !i.IsPaid)
@@ -69,16 +69,16 @@ namespace ArtemisBankingWebApp.Controllers
                 .Select(i => i.PaymentAmount)
                 .FirstOrDefault();
 
-            var vm = new ClienteHomeViewModel
+            var vm = new ClientHomeViewModel
             {
-                Cuentas = misCuentas,
-                Prestamos = misPrestamos,
-                Tarjetas = misTarjetas,
-                UltimasTransacciones = ultimas5,
-                SaldoTotal = saldoTotal,
-                DeudaTotal = deudaTotal,
-                ProximoPagoMinimo = proximoPagoMinimo,
-                ProximasCuotas = proximasCuotas
+                Accounts = myAccounts,
+                Loans = myLoans,
+                Cards = myCards,
+                LastTransactions = last5,
+                TotalBalance = totalBalance,
+                TotalDebt = totalDebt,
+                MinimumPayment = minimumPayment,
+                NextInstallments = nextLoanPayment
             };
 
             return View(vm);

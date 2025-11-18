@@ -77,8 +77,10 @@ namespace ArtemisBankingWebApi.Controllers.v1
                     return NoContent();
                 }
 
-                var transactions = accountDetail.Result.Transactions.Where(t => t.TransactionType == "CRÉDITO")
-                    .OrderByDescending(t => t.TransactionDate).ToList();
+                var transactions = accountDetail.Result.Transactions
+                    .Where(t => t.TransactionType == "CRÉDITO")
+                    .OrderByDescending(t => t.TransactionDate)
+                    .ToList();
 
                 var totalCount = transactions.Count;
                 var paginatedTransactions = transactions.Skip((page - 1) * pageSize).Take(pageSize).ToList();

@@ -6,12 +6,12 @@ using System.Security.Claims;
 namespace ArtemisBankingWebApp.Controllers
 {
     [Authorize(Roles = "cliente")]
-    public class AvancesController : Controller
+    public class CashAdvancesController : Controller
     {
         private readonly ICreditCardService _creditCardService;
         private readonly ITransactionService _transactionService;
 
-        public AvancesController(
+        public CashAdvancesController(
             ICreditCardService creditCardService,
             ITransactionService transactionService)
         {
@@ -20,26 +20,26 @@ namespace ArtemisBankingWebApp.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(int? tarjetaId)
+        public async Task<IActionResult> Index(int? cardId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var tarjetas = await _creditCardService.GetAllWithInclude();
-            var misTarjetas = tarjetas.Where(t => t.UserId == userId && t.IsActive).ToList();
+            var cards = await _creditCardService.GetAllWithInclude();
+            var myCards = cards.Where(t => t.UserId == userId && t.IsActive).ToList();
 
-            if (tarjetaId.HasValue)
+            if (cardId.HasValue)
             {
-                var tarjeta = misTarjetas.FirstOrDefault(t => t.Id == tarjetaId.Value);
-                if (tarjeta == null)
+                var card = myCards.FirstOrDefault(t => t.Id == cardId.Value);
+                if (card == null)
                     return RedirectToAction("Index", "Home");
 
-                ViewBag.TarjetaId = tarjetaId.Value;
-                ViewBag.TarjetaNumero = $"****{tarjeta.CardNumber.Substring(tarjeta.CardNumber.Length - 4)}";
-                ViewBag.LimiteDisponible = tarjeta.CreditLimit - tarjeta.CurrentDebt;
-                ViewBag.CreditoDisponible = tarjeta.CreditLimit;
+                ViewBag.CardId = cardId.Value;
+                ViewBag.CardNumber = $"****{card.CardNumber.Substring(card.CardNumber.Length - 4)}";
+                ViewBag.AvailableLimit = card.CreditLimit - card.CurrentDebt;
+                ViewBag.CreditLimit = card.CreditLimit;
             }
 
-            ViewBag.Tarjetas = misTarjetas;
+            ViewBag.Cards = myCards;
 
             return View();
         }

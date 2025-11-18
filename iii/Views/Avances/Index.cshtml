@@ -14,11 +14,11 @@
             <form method="post" class="bg-light p-4 rounded">
                 <div class="form-group mb-3">
                     <label>Tarjeta de Crédito</label>
-                    <select name="tarjetaId" class="form-control" required>
+                    <select name="cardId" class="form-control" required>
                         <option value="">-- Seleccione tarjeta --</option>
-                        @if (ViewBag.Tarjetas != null)
+                        @if (ViewBag.Cards != null)
                         {
-                            @foreach (var t in ViewBag.Tarjetas)
+                            @foreach (var t in ViewBag.Cards)
                             {
                                 <option value="@t.Id">****@t.CardNumber.Substring(t.CardNumber.Length - 4) - Disponible: @(t.CreditLimit - t.CurrentDebt).ToString("C2")</option>
                             }
@@ -28,8 +28,8 @@
 
                 <div class="form-group mb-3">
                     <label>Monto Solicitado</label>
-                    <input type="number" name="monto" class="form-control" step="0.01" min="100" required placeholder="Mínimo: 100.00" />
-                    <small class="form-text text-muted">Límite Disponible: @ViewBag.LimiteDisponible?.ToString("C2")</small>
+                    <input type="number" name="amount" class="form-control" step="0.01" min="100" required placeholder="Mínimo: 100.00" />
+                    <small class="form-text text-muted">Límite Disponible: @ViewBag.AvailableLimit?.ToString("C2")</small>
                 </div>
 
                 <div class="form-group mb-3">

@@ -1,4 +1,4 @@
-ï»¿@model IPagedList<ArtemisBanking.Core.Application.Dtos.Transaction.TransactionDto>
+@model IPagedList<ArtemisBanking.Core.Application.Dtos.Transaction.TransactionDto>
 @using ArtemisBanking.Core.Domain.Common.Enum
 @{
     ViewData["Title"] = "Historial de Transacciones";
@@ -13,10 +13,10 @@
             <label class="form-label">Tipo</label>
             <select name="type" class="form-control form-select">
                 <option value="">Todos</option>
-                <option value="1" selected="@(ViewBag.Type == 1)">DepÃ³sito</option>
+                <option value="1" selected="@(ViewBag.Type == 1)">Depósito</option>
                 <option value="2" selected="@(ViewBag.Type == 2)">Retiro</option>
                 <option value="3" selected="@(ViewBag.Type == 3)">Transferencia</option>
-                <option value="4" selected="@(ViewBag.Type == 4)">Pago PrÃ©stamo</option>
+                <option value="4" selected="@(ViewBag.Type == 4)">Pago Préstamo</option>
                 <option value="5" selected="@(ViewBag.Type == 5)">Pago Tarjeta</option>
                 <option value="6" selected="@(ViewBag.Type == 6)">Avance de Efectivo</option>
             </select>
@@ -40,7 +40,7 @@
             </select>
         </div>
         <div class="col-md-2">
-            <label class="form-label">BÃºsqueda</label>
+            <label class="form-label">Búsqueda</label>
             <input type="text" name="reference" class="form-control" placeholder="ID, origen, monto..." value="@ViewBag.Reference" />
         </div>
         <div class="col-md-1 d-flex align-items-end">
@@ -112,7 +112,7 @@
                                 <div class="modal-content">
                                     <div class="modal-header bg-primary text-white">
                                         <h5 class="modal-title" id="modalLabel-@t.Id">
-                                            Detalle TransacciÃ³n #@t.Id
+                                            Detalle Transacción #@t.Id
                                         </h5>
                                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
@@ -132,7 +132,7 @@
                                             <div class="col-md-6">
                                                 <p><strong>Origen:</strong> @t.Source</p>
                                                 <p><strong>Destino:</strong> @t.Beneficiary</p>
-                                                <p><strong>CÃ³digo:</strong> <code>#@t.Id</code></p>
+                                                <p><strong>Código:</strong> <code>#@t.Id</code></p>
                                                 <p>
                                                     <strong>Comprobante:</strong>
                                                     @if (!string.IsNullOrEmpty(t.ComprobanteUrl))
@@ -169,7 +169,7 @@
         </table>
     </div>
 
-    <!-- PAGINACIÃ“N -->
+    <!-- PAGINACIÓN -->
     <div class="d-flex justify-content-center mt-4">
         @Html.PagedListPager(Model, page => Url.Action("Index", new
         {
@@ -195,7 +195,7 @@
 
 @section Scripts {
     <script>
-        // Mantener foco en bÃºsqueda al filtrar
+        // Mantener foco en búsqueda al filtrar
         document.addEventListener("DOMContentLoaded", function () {
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('reference')) {

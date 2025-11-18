@@ -18,7 +18,6 @@ namespace ArtemisBankingWebApi.Controllers.v1
             _loanService = loanService;
         }
 
-     
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<LoanListDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -17,7 +17,7 @@ namespace ArtemisBankingWebApi.Controllers.v1
             _savingsAccountService = savingsAccountService;
         }
 
-      
+        
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<SavingsAccountsHomeDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
